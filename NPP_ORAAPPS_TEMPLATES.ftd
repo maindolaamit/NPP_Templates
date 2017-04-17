@@ -1,0 +1,3398 @@
+simple
+Name:makefile
+all:
+	g++ -c -Wall $[![{FileName}]!].cpp
+	g++ $[![{FileName}]!].o -o $[![{FileName}]!][>END<]!$[FingerTextData FingerTextData]@#
+xmlpubdef
+Lang:XML
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<dataTemplate name="$[![short_name]!]" description="$[![desc]!]" version="1.0" defaultPackage="$[0[]0]">
+<properties>
+   <property name="include_parameters" value="true" />
+   <property name="debug_mode" value="on" />
+</properties>
+<parameters>
+     <parameter name="P_ORG_ID" dataType="NUMBER"/>
+     <parameter name="P_CREATION_DATE_FROM" dataType="DATE"/>
+     <parameter name="P_CREATION_DATE_TO" dataType="DATE"/>
+     <parameter name="P_PR_NUMBER" dataType="VARCHAR2"/>
+</parameters>
+<dataQuery>
+   <sqlStatement name="Q_MAIN">
+      <![CDATA[
+               SELECT prha.segment1 pr_number
+                    , prla.line_num
+                    , TO_CHAR( prha.creation_date, 'dd-MON-yyyy' ) creation_date
+                    , prha.authorization_status
+                    , fu.user_name returned_by_user
+                    , hr_general.decode_person_name( NVL( prla.suggested_buyer_id, pah.employee_id ) ) returned_by
+                    , hr_general.decode_person_name( prha.preparer_id ) returned_to
+                    , ( SELECT pah.document_number
+                         FROM pon_auction_headers_all pah
+                        WHERE pah.auction_header_id = prla.auction_header_id )
+                         rfq_number
+                    , note return_reason
+                    , TO_CHAR( pah.action_date, 'dd-MON-yyyy' ) return_date
+                 FROM po_requisition_headers_all prha
+                    , po_requisition_lines_all prla
+                    , po_action_history pah
+                    , fnd_user fu
+                WHERE     prha.requisition_header_id = prla.requisition_header_id
+                      AND ( prla.suggested_buyer_id = fu.employee_id
+                           OR pah.employee_id = fu.employee_id )
+                      AND prha.authorization_status = 'RETURNED'
+                      AND pah.object_type_code = 'REQUISITION'
+                      AND pah.action_code = 'RETURN'
+                      AND prha.requisition_header_id = pah.object_id
+                      AND prha.org_id = :p_org_id
+                      AND prha.creation_date BETWEEN :p_creation_date_from AND :p_creation_date_to
+       ]]>
+   </sqlStatement>
+</dataQuery>
+<!-- <dataTrigger name="beforeReport" source=""/> -->
+<dataStructure>
+   <group name="G_RETURN_PR_DATA" source="Q_MAIN" >
+      <element name="PR_NUMBER" value="pr_number" />
+      <element name="LINE_NUM" value="line_num" />
+      <element name="CREATION_DATE" value="creation_date" />
+      <element name="AUTHORIZATION_STATUS" value="authorization_status" />
+      <element name="RETURNED_BY_USER" value="returned_by_user" />
+      <element name="RETURNED_BY" value="returned_by" />
+      <element name="RETURNED_TO" value="returned_to" />
+      <element name="RFQ_NUMBER" value="rfq_number" />
+      <element name="RETURN_REASON" value="return_reason" />
+      <element name="RETURN_DATE" value="return_date" />
+   </group>
+</dataStructure>
+<!-- <dataTrigger name="afterReport" source=""/> -->
+</dataTemplate>[>END<]!$[FingerTextData FingerTextData]@#
+oaspace
+Lang:XML
+                        <oa:messageLayout id="SpacerLayout$[![id]!]">
+                           <ui:contents>
+                              <oa:spacer id="Spacer$[![id]!]" height="2"/>
+                           </ui:contents>
+                        </oa:messageLayout>
+						[>END<]!$[FingerTextData FingerTextData]@#
+oapagebutton
+Lang:XML
+            <oa:pageButtonBar id="PageButtonBarRN">
+               <ui:contents>
+                  <oa:submitButton id="SaveBtn" text="Save" use="/oracle/apps/fnd/attributesets/Buttons/Apply" prompt="Save" shortDesc="Click to Save Work Request" />
+                  <oa:button id="Cancel" text="Cancel" prompt="Cancel" shortDesc="Go Back" serverUnvalidated="false">
+                     <ui:primaryClientAction>
+                        <ui:firePartialAction event="GoBack" id="firePartialAction112" unvalidated="true"/>
+                     </ui:primaryClientAction>
+                  </oa:button>
+                  <oa:submitButton id="SubmitBtn" text="Submit" use="/oracle/apps/fnd/attributesets/Buttons/Submit" prompt="Submit"/>
+               </ui:contents>
+            </oa:pageButtonBar>
+[>END<]!$[FingerTextData FingerTextData]@#
+oanewcol
+Lang:XML
+            <oa:column id="$[![column]!]Column">
+               <ui:columnHeader>
+                  <oa:sortableHeader id="$[![column]!]Header" prompt="$[![prompt]!]" shortDesc="$[![prompt]!]"/>
+               </ui:columnHeader>
+               <ui:contents>
+                  <oa:messageStyledText id="$[![column]!]" viewAttr="$[0[]0]" prompt="$[![prompt]!]"/>
+               </ui:contents>
+            </oa:column>
+[>END<]!$[FingerTextData FingerTextData]@#
+wfsetattrtx
+Lang:SQL
+wf_engine.setitemattrtext(
+                                 itemtype   => g_item_type
+                               , itemkey    => itemkey
+                               , aname      => '$[![attr]!]'
+                               , avalue     => '$[![value]!]'
+                                );$[0[]0]
+								[>END<]	!$[FingerTextData FingerTextData]@#
+wfsetattrnu
+Lang:SQL
+wf_engine.setitemattrnumber(
+                                 itemtype   => g_item_type
+                               , itemkey    => itemkey
+                               , aname      => '$[![attr]!]'
+                               , avalue     => $[![value]!]
+                                );$[0[]0]
+								[>END<]!$[FingerTextData FingerTextData]@#
+wfgetattrtx
+Lang:SQL
+wf_engine.getitemattrtext(
+                            itemtype   => itemtype
+                          , itemkey    => itemkey
+                          , aname      => '$[![default]!]'
+                          )$[0[]0]
+						  [>END<]!$[FingerTextData FingerTextData]@#
+wfgetattrnu
+Lang:SQL
+wf_engine.getitemattrnumber(
+                            itemtype   => itemtype
+                          , itemkey    => itemkey
+                          , aname      => '$[![default]!]'
+                          )$[0[]0]
+						  [>END<]!$[FingerTextData FingerTextData]@#
+wfcmds
+Lang:SQL
+/* We can use Scripts to delete/modify a workflow : @$FND_TOP/SQL/wfrmitt */
+
+-- Use wfrmitt.sql to delete all data in all Oracle Workflow design time and runtime tables for a particular item type. 
+-- This script prompts you for an item type from a list of valid item types.
+sqlplus apps/$APPS_PASS @$FND_TOP/sql/wfrmitt
+
+-- Use wfrmtype.sql to delete runtime data associated with a given item type. 
+-- This script prompts you for an item type to purge from a list of valid item types, then asks you to choose between deleting all runtime data
+-- associated with the specified item type or deleting only runtime data for the completed activities and items of the specified item type.
+sqlplus apps/$APPS_PASS @$FND_TOP/sql/wfrmtype
+
+-- Use wfrmita.sql to delete all workflow data for a specified item type attribute. 
+-- This script prompts you for the item type and the name of the attribute to delete. 
+-- Alternatively, you can use Oracle Workflow Builder to delete an item type attribute from a workflow definition stored in a file or a database.
+sqlplus apps/$APPS_PASS @$FND_TOP/sql/wfrmita
+
+
+-- To change a workflow item type internal name
+sqlplus apps/$APPS_PASS @$FND_TOP/sql/wfchitt XXXXPTR XXAMTTRN
+-- To change a workflow item type activity internal name
+sqlplus apps/$APPS_PASS @$FND_TOP/sql/wfchact XXXXPTR MAIN_TRAINING_PROCESS LESSON2
+-- To change the internal name of a message and update all references to the message.
+sqlplus apps/$APPS_PASS @$FND_TOP/sql/wfchmsg MSG_TYPE OLD_MSG_NAME NEW_MSG_NAME
+[>END<]!$[FingerTextData FingerTextData]@#
+upd
+Lang:SQL
+BEGIN
+   UPDATE apps.$[![]!]
+      SET $[![column]!] = $[![value]!]
+    WHERE $[0[]0];
+EXCEPTION
+   WHEN OTHERS THEN
+      NULL;
+END;
+[>END<]!$[FingerTextData FingerTextData]@#
+ttbl
+Lang:SQL
+   TYPE $[![tbl]!] IS TABLE OF $[![table]!]%ROWTYPE
+                 INDEX BY BINARY_INTEGER;
+
+   l_$[0[]0]        $[![tbl]!] ;
+[>END<]!$[FingerTextData FingerTextData]@#
+trec
+Lang:SQL
+TYPE $[![rec]!] IS RECORD (
+  $[0[]0] dept.name%TYPE );
+  
+l_rec $[![rec]!];
+[>END<]!$[FingerTextData FingerTextData]@#
+submit_request
+Lang:SQL
+      l_request_id :=
+         fnd_request.submit_request(
+                                     '$[![APPL]!]' --Application Short Name
+                                   , '$[![PROG_SHORT_NAME]!]' -- Conc Program Short Name
+                                   , NULL --Description
+                                   , NULL --Start Time
+                                   , FALSE --Sub Request
+                                   , NULL --Argument1
+                                   , NULL --Argument2
+                                    );
+
+      IF ( l_request_id <> 0 ) THEN
+         -- Make a parent child relationship
+         BEGIN
+            UPDATE fnd_concurrent_requests
+               SET has_sub_request = 'Y'
+             WHERE request_id = l_num_parent_id;
+
+            UPDATE fnd_concurrent_requests
+               SET is_sub_request = 'Y'
+                 , priority_request_id = g_request_id
+                 , parent_request_id = g_request_id
+             WHERE request_id = l_request_id;
+
+            COMMIT;
+         EXCEPTION
+            WHEN OTHERS THEN
+               apps.fnd_file.put_line( apps.fnd_file.LOG, 'Error : ' || SQLERRM );
+         END;
+
+         -- Wait for request
+         DECLARE
+            l_max_wait                                   NUMBER := 300; -- max wait time in seconds
+            l_interval                                   NUMBER := 60; -- interval time in seconds
+            l_phase_code                                 VARCHAR2( 15 );
+            l_status_code                                VARCHAR2( 15 );
+            x_dev_phase                                  VARCHAR2( 15 );
+            x_dev_status                                 VARCHAR2( 15 );
+            x_messages                                   VARCHAR2( 4000 );
+         BEGIN
+            -- Wait for Child request completeion
+            l_boolean_status :=
+               fnd_concurrent.wait_for_request(
+                                                request_id   => l_request_id
+                                              , interval     => l_interval -- Interval between checking the status of program
+                                              , max_wait     => l_max_wait -- Max wait time 0 means forever
+                                              , phase        => l_phase_code -- Program Phase
+                                              , status       => l_status_code -- Program Status
+                                              , dev_phase    => x_dev_phase -- COMPLETED
+                                              , dev_status   => x_dev_status -- NORMAL
+                                              , MESSAGE      => x_messages
+                                               );
+            IF ( l_dev_status <> 'NORMAL' ) THEN
+               x_errmsg := 'Program request not completed Normal. Request id : ' || l_reqimport_req_id;
+               RAISE excp_custom;
+            END IF;
+         END;
+      ELSE
+         x_errmsg := 'Unable to submit the request. Error : ' || SQLERRM;
+         RAISE excp_custom;
+      END IF;
+[>END<]!$[FingerTextData FingerTextData]@#
+setclient
+Lang:SQL
+EXECUTE dbms_application_info.set_client_info($[0[]0]);[>END<]!$[FingerTextData FingerTextData]@#
+selbeg
+Lang:SQL
+BEGIN      
+-- Select Query
+   SELECT $[0[]0]
+     INTO $[![]!]
+     FROM $[![]!];
+EXCEPTION --Exception Block   
+   WHEN NO_DATA_FOUND THEN
+      printlog('No Data Found');
+   WHEN OTHERS THEN
+      printlog('Error while . Error : '||sqlerrm);
+END;
+[>END<]!$[FingerTextData FingerTextData]@#
+sel
+Lang:SQL
+SELECT 1$[0[]0] 
+FROM apps.$[![]!] 
+WHERE 1=1;
+[>END<]!$[FingerTextData FingerTextData]@#
+oaprint
+Lang:SQL
+BEGIN
+   jdr_utils.printdocument( '/xxcust/oracle/apps/$[![path]!]/$[![page]!]' );
+END;[>END<]!$[FingerTextData FingerTextData]@#
+ldebug
+Lang:SQL
+debug_log('$[![message]!]',$[0[]0]);[>END<]!$[FingerTextData FingerTextData]@#
+ifee
+Lang:SQL
+IF($[![]!]) THEN
+   $[![]!];
+ELSIF($[![]!]) THEN
+   $[![]!];
+ELSE
+   $[0[]0];
+END IF;[>END<]!$[FingerTextData FingerTextData]@#
+ife
+Lang:SQL
+IF($[![]!]) THEN
+   $[![]!];
+ELSE
+   $[0[]0];
+END IF;[>END<]!$[FingerTextData FingerTextData]@#
+if
+Lang:SQL
+IF($[![]!]) THEN
+   $[![]!];
+END IF;[>END<]!$[FingerTextData FingerTextData]@#
+fori
+Lang:SQL
+FOR $[![indx]!] IN 1..$[![tbl_type]!].count
+LOOP
+   -- Initializing Variables
+   $[![tbl_type]!]( $[![indx]!] ).last_update_date   := SYSDATE;
+   $[![tbl_type]!]( $[![indx]!] ).last_update_login  := g_login_id;
+   $[![tbl_type]!]( $[![indx]!] ).last_updated_by    := g_user_id;
+   $[![tbl_type]!]( $[![indx]!] ).request_id         := g_request_id;
+   $[![tbl_type]!]( $[![indx]!] ).processed_flag     := $[![new_status]!];
+   $[![tbl_type]!]( $[![indx]!] ).error_message      := '$[0[]0]';
+   
+END LOOP;
+[>END<]!$[FingerTextData FingerTextData]@#
+forc
+Lang:SQL
+FOR $[![cur]!]_rec IN $[![cur]!]$[![()]!]
+LOOP
+   $[0[]0]
+END LOOP; -- End $[![cur]!]
+[>END<]!$[FingerTextData FingerTextData]@#
+fora
+Lang:SQL
+      IF ( $[![tbl]!].COUNT > 0 ) THEN
+         BEGIN
+            FORALL indx IN 1 .. $[![tbl]!].COUNT
+               UPDATE apps.$[0[]0]
+                  SET processed_flag      = $[![tbl]!]( indx ).processed_flag
+                    , error_message       = $[![tbl]!]( indx ).error_message
+                    , last_updated_by     = $[![tbl]!]( indx ).last_updated_by
+                    , last_update_date    = $[![tbl]!]( indx ).last_update_date
+                    , last_update_login   = $[![tbl]!]( indx ).last_update_login
+                    , request_id          = $[![tbl]!]( indx ).request_id
+                WHERE transaction_id = $[![tbl]!]( indx ).transaction_id;
+
+         EXCEPTION --Exception Block
+            WHEN OTHERS THEN
+               l_errmsg   := 'Error while Bulk updating the records, Error : ' || SQLERRM;
+               RAISE excp_custom;
+         END;
+
+      END IF;
+[>END<]!$[FingerTextData FingerTextData]@#
+flushsp
+Lang:SQL
+ALTER SYSTEM FLUSH SHARED_POOL;[>END<]!$[FingerTextData FingerTextData]@#
+flushca
+Lang:SQL
+ALTER SYSTEM FLUSH BUFFER_CACHE;[>END<]!$[FingerTextData FingerTextData]@#
+excp
+Lang:SQL
+
+EXCEPTION --Exception Block
+   $[0[]0]
+	WHEN OTHERS THEN
+      $[![message]!];
+[>END<]!$[FingerTextData FingerTextData]@#
+els
+Lang:SQL
+ELSIF($[![]!]) THEN
+   $[![]!];
+END IF;[>END<]!$[FingerTextData FingerTextData]@#
+dec
+Lang:SQL
+DECLARE
+   $[![var]!]                                        $[![type]!] := null;
+BEGIN
+$[0[]0]
+EXCEPTION--Exception Block
+   WHEN NO_DATA_FOUND THEN
+      DBMS_OUTPUT.put_line( 'No Data Found' );
+   WHEN OTHERS THEN
+      DBMS_OUTPUT.put_line( 'Unexpected error occurred. Error : ' || SQLERRM );
+END;
+[>END<]!$[FingerTextData FingerTextData]@#
+debug
+Lang:SQL
+debug_log('$[![message]!]',$[0[]0]);[>END<]!$[FingerTextData FingerTextData]@#
+dbut
+Lang:SQL
+DBMS_UTILITY.get_time;[>END<]!$[FingerTextData FingerTextData]@#
+dbo
+Lang:SQL
+DBMS_OUTPUT.put_line('$[0[]0]');[>END<]!$[FingerTextData FingerTextData]@#
+curopen
+Lang:SQL
+OPEN $[![cursor]!]( );
+FETCH $[![cursor]!]
+ INTO $[0[]0];
+ 
+   IF ( $[![cursor]!] %NOTFOUND ) THEN
+      CLOSE $[![cursor]!];
+      l_errmsg := 'No records fetched in cursor.';
+      RAISE excp_custom; -- Close cursor in excp_custom
+   END IF;
+CLOSE $[![cursor]!];[>END<]!$[FingerTextData FingerTextData]@#
+cur
+Lang:SQL
+CURSOR $[![cursor]!] IS
+   SELECT $[0[]0]
+     FROM $[![]!]
+    WHERE 1 = 1;[>END<]!$[FingerTextData FingerTextData]@#
+crwfproc
+Lang:SQL
+   ------------------------------------------------------------------------------------------------
+   -- PROCEDURE    : $[![proc]!]
+   -- Description  : This Workflow procedure will $[![description]!].
+   ------------------------------------------------------------------------------------------------
+   PROCEDURE $[![proc]!](
+         itemtype   IN     VARCHAR2
+       , itemkey    IN     VARCHAR2
+       , actid      IN     NUMBER
+       , funcmode   IN     VARCHAR2
+       , result     IN OUT VARCHAR2
+   )
+   IS
+      -- Declare cursors
+      -- Error code and Exception variables
+      l_retcode                                    VARCHAR2(1) := g_success_code;
+      l_errmsg                                     VARCHAR2( 4000 ) := g_success;
+      -- Declare variables
+   BEGIN
+      g_proc_name                                  := '$[![proc]!]';
+	   g_item_key 								            := itemkey;
+      IF ( funcmode = 'RUN' ) THEN
+         $[0[]0]
+         -- Set the result as success
+         result                                    := 'COMPLETE:Y';
+      END IF;  -- End funcmode  
+   EXCEPTION -- Exception block of Procedure
+      WHEN excp_custom THEN
+         wf_core.error_stack   := l_errmsg;
+         wf_core.context(
+                          g_package_name
+                        , g_proc_name
+                        , g_item_type
+                        , itemkey
+                        , TO_CHAR( actid )
+                        , funcmode
+                         );
+         debug_log( l_errmsg, g_proc_name );
+         result                := 'COMPLETE:N';
+         RAISE;
+      WHEN OTHERS THEN
+         l_errmsg              := 'Error in ' || g_proc_name || ' : ' || SQLERRM;
+         wf_core.error_stack   := l_errmsg;
+         wf_core.context(
+                          g_package_name
+                        , g_proc_name
+                        , itemtype
+                        , itemkey
+                        , TO_CHAR( actid )
+                        , funcmode
+                         );
+         debug_log( l_errmsg, g_proc_name );
+         RAISE;
+   END $[![proc]!];[>END<]!$[FingerTextData FingerTextData]@#
+crwfpkb
+Lang:SQL
+CREATE OR REPLACE PACKAGE BODY $[![package]!]
+IS
+-- #############################################################################
+-- #      Copyright (c) 2010 $[![company]!]
+-- #                All rights reserved
+-- #
+-- ############################################################################
+-- #
+-- # Application   : $[![appl]!]
+-- # File Name:    : $[![package]!].$[![ext]!]
+-- # Exec Method   : PL/SQL Stored - Procedure
+-- # Description   : Package Body used for Workflow Item $[![wfitem]!]
+-- #
+-- # Change History
+-- # -----------------------------------------------------------------------
+-- # Version     Date         Author           Remarks
+-- # =======  ===========  =============    ============================
+-- # 1.0      $[![(key)DATE:dd-MMM-yyyy]!]  Amit Maindola    Initial Version
+-- #
+-- #
+-- #
+-- ############################################################################ */
+   -- Declare Global Variables
+   g_success_code                      CONSTANT VARCHAR2( 1 ) := xxcust_wf_utility_pkg.success_code;
+   g_warning_code                      CONSTANT VARCHAR2( 1 ) := xxcust_wf_utility_pkg.warning_code;
+   g_failure_code                      CONSTANT VARCHAR2( 1 ) := xxcust_wf_utility_pkg.failure_code;
+   g_sysdate                                    DATE := SYSDATE;
+   g_user_id                                    NUMBER := fnd_profile.VALUE( 'USER_ID' );
+   g_package_name                      CONSTANT VARCHAR2( 30 ) := '$[![package]!]';
+   g_proc_name                                  VARCHAR2( 30 ) := NULL;
+   g_item_type                         CONSTANT VARCHAR2( 8 ) := '$[![wfitem]!]';
+   g_item_key                                   VARCHAR2( 100 ) := NULL;
+   excp_custom                                  EXCEPTION;
+
+   -- Debug Workflow
+   PROCEDURE debug_log(
+      p_node_name   IN VARCHAR2
+    , p_message     IN VARCHAR2
+   )
+   IS
+   BEGIN
+
+      xxcust_wf_utility_pkg.wf_debug_log(
+                                          p_itemtype               => g_item_type
+                                        , p_itemkey                => g_item_key
+                                        , p_node_name              => p_node_name
+                                        , p_node_type              => 'FUNCTION'
+                                        , p_pkg_name               => g_package_name
+                                        , p_pkg_sub_program_name   => g_proc_name
+                                        , p_message                => p_message
+                                         );
+
+   END debug_log;
+
+   $[0[]0]
+      
+
+END $[![package]!];
+/
+
+SHOW ERROR
+/
+[>END<]!$[FingerTextData FingerTextData]@#
+crwflaunch
+Lang:SQL
+------------------------------------------------------------------------------------------------
+-- PROCEDURE    : $[![procedure]!]
+-- Description  : This Workflow procedure will launch $[![process]!].
+------------------------------------------------------------------------------------------------
+   PROCEDURE $[![procedure]!]( p_$[![id]!] IN INTEGER
+    , x_retcode      OUT VARCHAR2
+    , x_errmsg       OUT VARCHAR2
+
+   )
+   IS
+      l_user_name                                  VARCHAR2( 30 ) := get_user( g_user_id );
+      l_itemkey                                    VARCHAR2( 300 ) := $[![itemkey]!];
+
+      CURSOR $[![cursor]!]
+      IS
+         SELECT *
+           FROM $[![table]!]
+          WHERE $[![column]!] = p_$[![id]!];
+
+      $[![cursor]!]_rec                           $[![cursor]!]%ROWTYPE;
+   BEGIN
+      x_retcode := 'S';
+      x_errmsg := 'Workflow process launched Successfully.';
+      debug_log( 'Opening cursor for ID : ' || p_$[![id]!] );
+
+      OPEN $[![cursor]!];
+      FETCH $[![cursor]!]
+        INTO $[![cursor]!]_rec;
+      CLOSE $[![cursor]!];
+
+	  l_itemkey := $[![cursor]!]_rec.$[0[]0] ;
+      debug_log( 'Details fetched successfully.' );
+      wf_engine.createprocess(
+                               itemtype   => g_item_type
+                             , itemkey    => l_itemkey
+                             , process    => '$[![process]!]'
+                             , owner_role      => l_user_name
+                              );
+
+      wf_engine.setitemuserkey(
+                                itemtype   => g_item_type
+                              , itemkey    => l_itemkey
+                              , userkey    => 'USERKEY: ' || l_itemkey
+                               );
+      wf_engine.setitemowner(
+                              itemtype   => g_item_type
+                            , itemkey    => l_itemkey
+                            , owner      => 'SYSADMIN'
+                             );
+
+      wf_engine.setitemattrtext(
+                                 itemtype   => g_item_type
+                               , itemkey    => l_itemkey
+                               , aname      => '$[0[]0]'
+                               , avalue     => '' -- An existing role/User
+                                );
+      debug_log( 'Attributes set, starting process.' );
+      wf_engine.startprocess( g_item_type, l_itemkey );
+      COMMIT;
+EXCEPTION -- Exception block of Procedure
+   WHEN OTHERS THEN
+         x_retcode := 'E';
+         x_errmsg := 'Error while launching Workflow, Error : ' || SQLERRM;
+         debug_log( x_errmsg );
+   END $[![procedure]!];
+[>END<]!$[FingerTextData FingerTextData]@#
+crwfhndlnotif
+Lang:SQL
+   ------------------------------------------------------------------------------------------------
+   -- PROCEDURE    : $[![proc]!]_HNDLNF
+   -- Description  : This Workflow procedure will handle notification for $[![description]!].
+   ------------------------------------------------------------------------------------------------
+   PROCEDURE $[![proc]!]_HNDLNF(
+         itemtype   IN     VARCHAR2
+       , itemkey    IN     VARCHAR2
+       , actid      IN     NUMBER
+       , funcmode   IN     VARCHAR2
+       , result     IN OUT VARCHAR2
+   )
+   IS
+      -- Error code and Exception variables
+      l_errmsg                                     VARCHAR2 (4000) := NULL;
+      l_retcode                                    VARCHAR2 (1) := g_success_code;
+      l_nid                                        NUMBER;
+      l_act_result_code                            VARCHAR2 (200);
+      l_resp_comment                               VARCHAR2 (400);
+   -- Declare variables
+   BEGIN
+      g_proc_name := '$[![proc]!]_HNDLNF';
+      g_item_key := itemkey;
+      IF (funcmode = 'RESPOND') THEN
+         -- derive the current notification id
+         l_nid := wf_engine.context_nid;
+         l_act_result_code := wf_notification.getattrtext ( l_nid, 'RESULT');
+         l_resp_comment := wf_notification.getattrtext ( l_nid, 'REJECTED_REASON');
+         IF (l_act_result_code = 'REJECTED') THEN
+            -- Check if comments are empty
+            IF (l_resp_comment IS NULL) THEN
+               result := 'ERROR: You must enter rejection reason for Rejecting the Request.';
+               RETURN;
+            END IF;
+         ELSIF (l_act_result_code = 'APPROVED') THEN
+            $[0[]0]
+         END IF;
+         -- Set the result as success
+         result := 'COMPLETE:Y';
+      END IF; -- End funcmode
+   EXCEPTION -- Exception block of Procedure
+      WHEN excp_custom THEN
+         wf_core.error_stack := l_errmsg;
+         wf_core.context (
+                          g_package_name
+                        , g_proc_name
+                        , g_item_type
+                        , g_item_key
+                        , TO_CHAR (actid)
+                        , funcmode
+                         );
+         debug_log ( l_errmsg, g_proc_name);
+         RAISE;
+      WHEN OTHERS THEN
+         l_errmsg := 'Error in ' || g_proc_name || ' : ' || SQLERRM;
+         wf_core.error_stack := l_errmsg;
+         wf_core.context (
+                          g_package_name
+                        , g_proc_name
+                        , g_item_type
+                        , g_item_key
+                        , TO_CHAR (actid)
+                        , funcmode
+                         );
+         debug_log ( l_errmsg, g_proc_name);
+         RAISE;
+   END $[![proc]!]_HNDLNF;[>END<]!$[FingerTextData FingerTextData]@#
+crwfdebugproc
+Lang:SQL
+   ------------------------------------------------------------------------------------------------
+   -- PROCEDURE    : WF_DEBUG_LOG
+   -- Description  : This Procedur will make entries into WF Custom Debug Log table
+   ------------------------------------------------------------------------------------------------
+
+PROCEDURE wf_debug_log(
+   p_itemtype               IN VARCHAR2
+ , p_itemkey                IN VARCHAR2
+ , p_node_name              IN VARCHAR2
+ , p_node_type              IN VARCHAR2
+ , p_pkg_name               IN VARCHAR2
+ , p_pkg_sub_program_name   IN VARCHAR2
+ , p_description            IN VARCHAR2
+ , p_message                IN VARCHAR2
+)
+IS
+   PRAGMA AUTONOMOUS_TRANSACTION;
+   l_log_id                                     NUMBER;
+BEGIN
+
+   BEGIN
+      l_log_id := $[![SCHEMA]!].$[![SEQ]!].NEXTVAL;
+   EXCEPTION
+      WHEN OTHERS THEN
+         SELECT NVL( MAX( log_id ), 0 ) + 1
+           INTO l_log_id
+           FROM $[![TABLE]!];
+   END;
+
+   INSERT INTO $[![SCHEMA]!].$[![TABLE]!]( log_id
+                                        , item_type
+                                        , item_key
+                                        , node_name
+                                        , node_type
+                                        , pkg_name
+                                        , pkg_sub_program_name
+                                        , description
+                                        , transaction_date )
+   VALUES (
+             l_log_id
+           , p_itemtype
+           , p_item_key
+           , p_node_name
+           , p_node_type
+           , p_pkg_name
+           , p_pkg_sub_program_name
+           , p_message
+           , SYSDATE
+          );
+   COMMIT;
+EXCEPTION
+   WHEN OTHERS THEN
+      DBMS_OUTPUT.put_line( 'Error : ' || SQLERRM );
+END wf_debug_log;
+[>END<]!$[FingerTextData FingerTextData]@#
+crwfdebug
+Lang:SQL
+   -- Debug Procedure
+   PROCEDURE debug_log (
+      p_message     IN VARCHAR2
+    , p_node_name   IN VARCHAR2
+   )
+   IS
+   BEGIN
+      xxcust_wf_utility_pkg.wf_debug_log (
+                                          p_itemtype               => g_item_type
+                                        , p_itemkey                => g_item_key
+                                        , p_node_name              => NVL (p_node_name, g_proc_name)
+                                        , p_node_type              => 'FUNCTION'
+                                        , p_pkg_name               => g_package_name
+                                        , p_pkg_sub_program_name   => g_proc_name
+                                        , p_message                => p_message
+                                         );
+      xxcust_utility_pkg.printlog (p_message);
+   END debug_log;
+[>END<]!$[FingerTextData FingerTextData]@#
+crwfcmnattr
+Lang:SQL
+   ------------------------------------------------------------------------------------------------
+   -- PROCEDURE    : SET_COMMON_ATTRIBUTES
+   -- Description  : This procedure will set commonly used WF Attributes.
+   ------------------------------------------------------------------------------------------------
+   PROCEDURE set_common_attributes(
+      x_errbuf       OUT VARCHAR2
+    , x_retcode      OUT VARCHAR2
+    , p_subject   IN     VARCHAR2
+    , p_message   IN     VARCHAR2
+   )
+   IS
+      -- Declare cursors
+      -- Declare Out and exception variables
+      -- Declare Varibales
+      l_user_id            NUMBER := fnd_global.user_id;
+      l_user_name          VARCHAR2( 100 ) := fnd_global.user_name;
+   BEGIN
+      -- Initializing out parameters
+      -- g_proc_name          := 'SET_COMMON_ATTRIBUTES';
+      x_errbuf           := NULL;
+      x_retcode          := g_success_code;
+
+      IF ( g_item_key IS NULL ) THEN -- Throw error if item key is null
+         x_errbuf           := 'Global Item key is Null.';
+         x_retcode          := g_failure_code;
+      ELSE
+         -- Create/Update the role
+         xxcust_wf_utility_pkg.crupd_adhoc_role(
+                                                 x_errbuf              => x_errbuf
+                                               , x_retcode             => x_retcode
+                                               , p_role_name           => g_performer_role
+                                               , p_role_dname          => g_performer_role_dname
+                                               , p_email               => NULL
+                                               , p_notif_preference    => 'QUERY'
+                                               , p_rm_existing_users   => TRUE -- remove previous users
+                                                );
+
+
+         -- Check procedure status
+         IF ( x_retcode <> g_success_code ) THEN
+            RAISE excp_custom;
+         END IF;
+
+         -- remove previous users
+         -- wf_directory.removeusersfromadhocrole( g_performer_role );
+
+         -- Set performer role
+         wf_engine.setitemattrtext(
+                                    itemtype   => g_item_type
+                                  , itemkey    => g_item_key
+                                  , aname      => 'PERFORMER'
+                                  , avalue     => g_performer_role -- An existing role/User
+                                   );
+
+         -- Set subject
+         wf_engine.setitemattrtext(
+                                    itemtype   => g_item_type
+                                  , itemkey    => g_item_key
+                                  , aname      => 'SUBJECT'
+                                  , avalue     => p_subject
+                                   );
+         wf_engine.setitemattrnumber(
+                                      itemtype   => g_item_type
+                                    , itemkey    => g_item_key
+                                    , aname      => 'USER_ID'
+                                    , avalue     => l_user_id
+                                     );
+
+         -- Set from Role
+         IF ( l_user_name = 'SYSADMIN' ) THEN
+            --debug_log ( 'Setting Responder', g_proc_name);
+            l_user_name          := xxcust_wf_utility_pkg.get_responder(
+                                                                         p_item_type      => g_item_type
+                                                                       , p_item_key       => g_item_key
+                                                                       , p_item_message   => p_message
+                                                                        );
+         END IF;
+         wf_engine.setitemattrtext(
+                                    itemtype   => g_item_type
+                                  , itemkey    => g_item_key
+                                  , aname      => '#FROM_ROLE'
+                                  , avalue     => NVL( l_user_name, 'SYSADMIN' )
+                                   );
+      END IF;
+   EXCEPTION -- Exception block of Procedure
+      WHEN excp_custom THEN
+         x_retcode          := g_failure_code;
+         debug_log( x_errbuf, g_proc_name );
+      WHEN OTHERS THEN
+         x_errbuf           := 'Unexpected Error while Setting Common WF Attributes Error : ' || SQLERRM;
+         x_retcode          := g_failure_code;
+         debug_log( x_errbuf, g_proc_name );
+   END set_common_attributes;
+[>END<]!$[FingerTextData FingerTextData]@#
+crview
+Lang:SQL
+-- #############################################################################
+-- #      Copyright (c) $[![company]!]
+-- #                All rights reserved
+-- #
+-- ############################################################################
+-- # Application   : $[![appl]!]
+-- # File Name:    : $[![View]!].$[![ext]!]
+-- # Type          : View                                                                                   
+-- # Exec Method   : PL/SQL File
+-- # Description   : This script will creates View - $[![View]!]                                      
+-- #                 This view has $[![desc]!].                        
+-- # Change History
+-- # -----------------------------------------------------------------------
+-- # Version     Date         Author           Remarks
+-- # =======  ===========  =============    ============================
+-- # 1.0      $[![(key)DATE:dd-MMM-yyyy]!]  Amit Maindola    Initial Version
+-- #**************************************************************************************************************/
+
+CREATE OR REPLACE VIEW APPS.$[![View]!]
+(
+   ship_to_number
+ , non_consigned_to_consigned
+ , ship_to_type
+ , no_parts_fs_vmi_ext
+ , no_parts_fs_vmi_null_int
+ , vmi_org_setup
+ , part_setup
+)
+AS
+   SELECT *
+     FROM apps.$[0[]0];
+[>END<]
+!$[FingerTextData FingerTextData]@#
+crtab
+Lang:SQL
+-- #############################################################################
+-- #      Copyright (c) $[![company]!]
+-- #                All rights reserved
+-- #
+-- ############################################################################
+-- # Application   : $[![appl]!]
+-- # File Name:    : $[![table]!].$[![ext]!]
+-- # Type          : Table                                                                                   
+-- # Exec Method   : PL/SQL File
+-- # Description   : This script creates table - $[![table]!] under the schema $[![appl]!]                                   
+-- #                                          
+-- # Change History
+-- # -----------------------------------------------------------------------
+-- # Version     Date         Author           Remarks
+-- # =======  ===========  =============    ============================
+-- # 1.0      $[![(key)DATE:dd-MMM-yyyy]!]  Amit Maindola    Initial Version
+-- #**************************************************************************************************************/
+
+DROP TABLE $[![appl]!].$[![table]!] CASCADE CONSTRAINTS;
+
+CREATE TABLE $[![appl]!].$[![table]!]
+(
+   $[0[]0]ID                               NUMBER
+  ,NUMBER                   VARCHAR2( 50 )
+  ,ship_to_type                                 VARCHAR2( 10 )
+  , CODE                          VARCHAR2( 20 )
+  ,vmi_org_setup                                VARCHAR2( 3 )
+  ,part_setup                                   VARCHAR2( 3 )
+  ,description                                  VARCHAR2( 200 )
+  ,status_code                                  VARCHAR2( 30 )
+  ,creation_date                                DATE  NOT NULL
+  ,created_by                                   NUMBER   NOT NULL
+  ,last_update_date                             DATE
+  ,last_updated_by                              NUMBER
+  ,last_update_login                            NUMBER
+  ,program_update_date                          DATE
+  ,program_application_id                       NUMBER
+  ,program_id                                   NUMBER
+  ,request_id                                   NUMBER
+  ,attribute1                                   VARCHAR2( 150 )
+  ,attribute2                                   VARCHAR2( 150 )
+  ,attribute3                                   VARCHAR2( 150 )
+  ,attribute4                                   VARCHAR2( 150 )
+  ,attribute5                                   VARCHAR2( 150 )
+  ,attribute6                                   VARCHAR2( 150 )
+  ,attribute7                                   VARCHAR2( 150 )
+  ,attribute8                                   VARCHAR2( 150 )
+  ,attribute9                                   VARCHAR2( 150 )
+  ,attribute10                                  VARCHAR2( 150 )
+  ,attribute11                                  VARCHAR2( 150 )
+  ,attribute12                                  VARCHAR2( 150 )
+  ,attribute13                                  VARCHAR2( 150 )
+  ,attribute14                                  VARCHAR2( 150 )
+  ,attribute15                                  VARCHAR2( 150 )
+);
+
+-- Grant all to table
+
+PROMPT Granting Previlages to APPS on Table $[![table]!]...
+
+GRANT ALL ON $[![appl]!].$[![table]!] TO apps;
+
+-- Create Synonm for table
+PROMPT Creating Synonm in APPS for Table $[![table]!]...
+
+CREATE OR REPLACE SYNONYM APPS.$[![table]!] FOR $[![appl]!].$[![table]!];
+
+
+PROMPT Creating Synonm in APPSREAD for Table $[![table]!]...
+
+CREATE OR REPLACE SYNONYM APPSREAD.$[![table]!] FOR $[![appl]!].$[![table]!];
+
+[>END<]
+!$[FingerTextData FingerTextData]@#
+crproc
+Lang:SQL
+------------------------------------------------------------------------------------------------
+-- PROCEDURE    : $[![proc]!]
+-- Description  : This procedure will $[![description]!].
+------------------------------------------------------------------------------------------------
+
+PROCEDURE $[![proc]!](
+   x_retcode      OUT VARCHAR2
+ , x_errbuf       OUT VARCHAR2
+ , p_$[0[]0]        IN     VARCHAR2
+)
+IS
+   -- Declare cursors
+   -- Declare Out and exception variables
+   l_retcode                                    NUMBER := g_success_code;
+   l_errmsg                                     VARCHAR2( 4000 ) := g_success;
+   excp_skip                                    EXCEPTION;
+-- Declare Varibales
+BEGIN
+   -- Initializing out parameters
+   g_proc_name                                  := '$[![proc]!]';
+   x_errbuf                                    := l_errmsg;
+   x_retcode                                   := l_retcode;
+
+EXCEPTION -- Exception block of Procedure
+   WHEN excp_custom THEN
+      ROLLBACK;
+      x_errbuf                                    := l_errmsg;
+      x_retcode                                   := l_retcode;
+      printlog( l_errmsg );
+   WHEN OTHERS THEN
+      ROLLBACK;
+      x_errbuf                                    := form_err_msg;
+      x_retcode                                   := g_failure_code;
+      printlog( x_errbuf );
+END $[![proc]!];[>END<]!$[FingerTextData FingerTextData]@#
+crprintlog
+Lang:SQL
+   ------------------------------------------------------------------------------------------------
+   -- PROCEDURE    : PRINTLOG
+   -- Description  : This procedure is used to print log messages in Log file and Console
+   ------------------------------------------------------------------------------------------------
+   PROCEDURE printlog (p_message IN VARCHAR2)
+   IS
+      l_errmsg                                     VARCHAR2 (10000);
+   BEGIN
+      l_errmsg := SUBSTR ( p_message, 1, g_err_length_limit);
+      fnd_file.put_line ( fnd_file.LOG, l_errmsg);
+      DBMS_OUTPUT.put_line (l_errmsg);
+   END printlog;
+[>END<]!$[FingerTextData FingerTextData]@#
+crpkg
+Lang:SQL
+CREATE OR REPLACE PACKAGE $[![package]!]
+AS
+-- #############################################################################
+-- #      Copyright (c) 2010 $[![company]!]
+-- #                All rights reserved
+-- #
+-- ############################################################################
+-- #
+-- # Application   : $[![appl]!]
+-- # File Name:    : $[![package]!].$[![ext]!]
+-- # Exec Method   : PL/SQL Stored - Procedure
+-- # Description   : Package Specification used for $[0[]0]
+-- #
+-- # Change History
+-- # -----------------------------------------------------------------------
+-- # Version     Date         Author           Remarks
+-- # =======  ===========  =============    ============================
+-- # 1.0      $[![(key)DATE:dd-MMM-yyyy]!]  Amit Maindola    Initial Version
+-- #
+-- #
+-- #
+-- ############################################################################ */
+   PROCEDURE $[0[]0]main(
+      errbuf           OUT NOCOPY VARCHAR2
+    , retcode          OUT NOCOPY NUMBER
+    , p_parameter   IN            NUMBER
+   );
+END $[![package]!];
+/
+
+SHOW ERROR
+/
+[>END<]!$[FingerTextData FingerTextData]@#
+crpkb
+Lang:SQL
+CREATE OR REPLACE PACKAGE BODY $[![package]!]
+IS
+-- #############################################################################
+-- #      Copyright (c) 2010 $[![company]!]
+-- #                All rights reserved
+-- #
+-- ############################################################################
+-- #
+-- # Application   : $[![appl]!]
+-- # File Name:    : $[![package]!].$[![ext]!]
+-- # Exec Method   : PL/SQL Stored - Procedure
+-- # Description   : Package Body used for $[0[]0]
+-- #
+-- # Change History
+-- # -----------------------------------------------------------------------
+-- # Version     Date         Author           Remarks
+-- # =======  ===========  =============    ============================
+-- # 1.0      $[![(key)DATE:dd-MMM-yyyy]!]  Amit Maindola    Initial Version
+-- #
+-- #
+-- #
+-- ############################################################################ */
+   -- Declare Global Variables
+   g_user_id                                    NUMBER := fnd_global.user_id;
+   g_login_id                                   NUMBER := fnd_global.conc_login_id;
+   g_request_id                                 NUMBER := fnd_global.conc_request_id;
+   g_program_appl_id                            NUMBER := fnd_global.prog_appl_id;
+   g_program_id                                 NUMBER := fnd_global.conc_program_id;
+   g_success_code                      CONSTANT NUMBER := 0;
+   g_warning_code                      CONSTANT NUMBER := 1;
+   g_failure_code                      CONSTANT NUMBER := 2;
+   g_success                           CONSTANT VARCHAR2( 30 ) := 'SUCCESS';
+   g_sysdate                                    DATE := SYSDATE;
+   g_delimiter                                  VARCHAR2( 30 ) := '   ';
+   g_err_length_limit                       NUMBER := 1500;
+   g_package_name  					   CONSTANT VARCHAR2(30) := '$[![package]!]';
+   g_proc_name VARCHAR2(100) 					:= NULL;
+   excp_custom                                  EXCEPTION;
+
+   -- Declare User Global Variables
+
+   ------------------------------------------------------------------------------------------------
+   -- PROCEDURE    : PRINTLOG
+   -- Description  : This procedure is used to print log messages
+   ------------------------------------------------------------------------------------------------
+   PROCEDURE printlog( p_message IN VARCHAR2 )
+   IS
+   BEGIN
+      fnd_file.put_line( fnd_file.LOG, p_message );
+   END printlog;
+
+   -- Form the error message for when others
+   FUNCTION form_err_msg
+      RETURN VARCHAR2
+   IS
+   BEGIN
+      RETURN 'Error occured in ' || g_proc_name || '. Error : ' || SQLERRM;
+   EXCEPTION --Exception Block
+      WHEN OTHERS THEN
+         printlog( 'Error while forming messgage. Error : ' || SQLERRM );
+   END;
+
+   ------------------------------------------------------------------------------------------------
+   -- PROCEDURE    : populate_staging_tables
+   -- Description  : This procedure is used to populate
+   ------------------------------------------------------------------------------------------------
+   PROCEDURE populate_staging_tables(
+      x_retcode               OUT NUMBER
+    , x_errmsg                OUT VARCHAR2
+    , p_850poo_file_path   IN     VARCHAR2
+   )
+   IS
+      -- Declare local variables
+      l_new_header_id                              NUMBER;
+   -- Declare cursors
+   -- Declare table types
+   BEGIN
+      -- Initialize out parameters
+      g_proc_name := 'POPULATE_STAGING_TABLES';
+      x_retcode := g_success_code;
+      x_errmsg := g_success;
+   EXCEPTION
+      WHEN excp_custom THEN
+         x_retcode := g_failure_code;
+      WHEN OTHERS THEN
+         x_errmsg := form_err_msg
+         x_retcode := g_failure_code;
+   END populate_staging_tables;
+
+   ------------------------------------------------------------------------------------------------
+   -- PROCEDURE    : MAIN
+   -- Description  : This procedure is used to submit the program attached with Executable.
+   ------------------------------------------------------------------------------------------------
+   PROCEDURE main(
+      errbuf           OUT NOCOPY VARCHAR2
+    , retcode          OUT NOCOPY NUMBER
+    , p_parameter   IN            NUMBER
+   )
+   IS
+      -- Error code and Exception variables
+      l_retcode                                    NUMBER := g_success_code;
+      l_errmsg                                     VARCHAR2( 4000 ) := g_success;
+      excp_skip                                    EXCEPTION;
+	  g_proc_name := 'MAIN';
+      -- User Defined variables
+      l_site_location                              dba_objects.object_type%TYPE DEFAULT NULL;
+   -- Declare Cursors
+   BEGIN
+      -- Initializing out parameters
+      g_proc_name := 'MAIN';
+      errbuf := g_success;
+      retcode := g_success_code;
+      printlog( '================================================================================================' );
+      printlog( '-------------------------------- Main procedure of the package starts-----------------------------' );
+      printlog( '---- p_parameter          : ' || p_parameter );
+      printlog( '================================================================================================' );
+      printlog( '' );
+      printlog( '' );
+      printlog( 'Populating Staging tables...' );
+      populate_staging_tables(
+                               x_retcode            => l_retcode
+                             , x_errmsg             => l_errmsg
+                             , p_                   => ''
+                              );
+
+      -- Check procedure status
+      IF ( l_retcode <> g_success_code ) THEN
+         printlog( l_errmsg );
+         RAISE excp_skip;
+      END IF;$[0[]0]
+   EXCEPTION
+      WHEN excp_custom THEN
+         ROLLBACK;
+         errbuf := l_errmsg;
+         retcode := l_retcode;
+         -- Print the error details in the log file
+         printlog( errbuf );
+      WHEN OTHERS THEN
+         ROLLBACK;
+         errbuf := form_err_msg;
+         retcode := g_failure_code;
+         -- Print the error details in the log file
+         printlog( errbuf );
+   END;
+END $[![package]!];
+/
+
+SHOW ERROR
+/
+[>END<]!$[FingerTextData FingerTextData]@#
+crintf
+Lang:SQL
+CREATE OR REPLACE PACKAGE BODY $[![intf_pkg]!]
+IS
+-- #############################################################################
+-- #      Copyright (c) 2010 $[![company]!]
+-- #                All rights reserved
+-- #
+-- ############################################################################
+-- #
+-- # Application   : $[![appl]!]
+-- # File Name:    : $[![package]!].$[![ext]!]
+-- # Exec Method   : PL/SQL Stored - Procedure
+-- # Description   : Package Body used for $[0[]0] Interface
+-- #
+-- # Change History
+-- # -----------------------------------------------------------------------
+-- # Version     Date         Author           Remarks
+-- # =======  ===========  =============    ============================
+-- # 1.0      $[![(key)DATE:dd-MMM-yyyy]!]  Amit Maindola    Initial Version
+-- #
+-- #
+-- #
+-- ############################################################################ */
+   -- Declare Global Variables
+   g_user_id                                    NUMBER := fnd_global.user_id;
+   g_login_id                                   NUMBER := fnd_global.conc_login_id;
+   g_request_id                                 NUMBER := fnd_global.conc_request_id;
+   g_program_appl_id                            NUMBER := fnd_global.prog_appl_id;
+   g_program_id                                 NUMBER := fnd_global.conc_program_id;
+   g_success_code                      CONSTANT NUMBER := 0;
+   g_warning_code                      CONSTANT NUMBER := 1;
+   g_failure_code                      CONSTANT NUMBER := 2;
+   g_success                           CONSTANT VARCHAR2( 30 ) := 'SUCCESS';
+   g_sysdate                                    DATE := SYSDATE;
+   g_delimiter                                  VARCHAR2( 30 ) := '   ';
+   g_err_length_limit                       NUMBER := 1500;
+   g_package_name  					   CONSTANT VARCHAR2(30) := '$[![package]!]';
+   g_proc_name VARCHAR2(100) 					:= NULL;
+   excp_custom                                  EXCEPTION;
+
+   -- Declare User Global Variables
+   TYPE $[![t_type_name]!] IS TABLE OF apps.$[![stg_tbl]!]%ROWTYPE
+                               INDEX BY BINARY_INTEGER;
+
+   ------------------------------------------------------------------------------------------------
+   -- PROCEDURE    : PRINTLOG
+   -- Description  : This procedure is used to print log messages
+   ------------------------------------------------------------------------------------------------
+   PROCEDURE printlog( p_message IN VARCHAR2 )
+   IS
+   BEGIN
+      fnd_file.put_line( fnd_file.LOG, p_message );
+      DBMS_OUTPUT.put_line( p_message );
+   END printlog;
+
+   -- Form the error message for when others
+   FUNCTION form_err_msg
+      RETURN VARCHAR2
+   IS
+   BEGIN
+      RETURN 'Error occured in ' || g_proc_name || '. Error : ' || SQLERRM;
+   EXCEPTION --Exception Block
+      WHEN OTHERS THEN
+         printlog( 'Error while forming messgage. Error : ' || SQLERRM );
+   END;
+
+   ------------------------------------------------------------------------------------------------
+   -- PROCEDURE    : POPULATE_STAGING_TABLES
+   -- Description  : This procedure is used to populate
+   ------------------------------------------------------------------------------------------------
+   PROCEDURE populate_staging_tables(
+      x_retcode   OUT NUMBER
+    , x_errmsg    OUT VARCHAR2
+   )
+   IS
+      -- Declare local variables
+      l_new_header_id                              NUMBER;
+   -- Declare cursors
+   -- Declare table types
+   BEGIN
+      -- Initialize out parameters
+      g_proc_name   := 'POPULATE_STAGING_TABLES';
+      x_retcode     := g_success_code;
+      x_errmsg      := g_success;
+   -- Enter the logic to import records in Staging table
+   EXCEPTION
+      WHEN excp_custom THEN
+         x_retcode   := g_failure_code;
+      WHEN OTHERS THEN
+         x_errmsg    := form_err_msg;
+         x_retcode   := g_failure_code;
+   END populate_staging_tables;
+
+   ------------------------------------------------------------------------------------------------
+   -- PROCEDURE    : REFRESH_EXISTING_RECORDS
+   -- Description  : This procedure is used to refresh error records.
+   ------------------------------------------------------------------------------------------------
+   PROCEDURE refresh_existing_records(
+      x_retcode   OUT NUMBER
+    , x_errmsg    OUT VARCHAR2
+   )
+   IS
+      -- Declare cursors
+   BEGIN
+      -- Initialize out parameters
+      x_retcode   := g_success_code;
+      x_errmsg    := g_success;
+
+      -- Delete the duplicate records
+      BEGIN
+         DELETE apps.$[![stg_tbl]!] stg
+          WHERE EXISTS
+                   (SELECT 1
+                      FROM $[![stg_tbl]!] hdr
+                     WHERE     hdr.processed_flag = 'N'
+                           AND hdr.$[![stg_id]!] <> stg.$[![stg_id]!])
+                           AND hdr.invoice_number = stg.invoice_number ;
+
+         DELETE apps.$[![stg_tbl]!] stg
+          WHERE stg.processed_flag = 'E'
+                AND EXISTS
+                       (SELECT 1
+                          FROM apps.$[![stg_tbl]!] hdr
+                         WHERE     hdr.processed_flag = 'N'
+                               AND hdr.invoice_number = stg.invoice_number
+                               AND hdr.creation_date > stg.creation_date)
+                               AND hdr.$[![stg_id]!] <> stg.$[![stg_id]!];
+
+         COMMIT;
+      EXCEPTION
+         WHEN OTHERS THEN
+            x_errmsg   := 'Error while deleting archived records. Error : ' || SQLERRM;
+            RAISE excp_custom;
+
+      END;
+
+   EXCEPTION
+      WHEN excp_custom THEN
+         ROLLBACK;
+         x_retcode   := g_failure_code;
+      WHEN OTHERS THEN
+         x_errmsg    := form_err_msg;
+         x_retcode   := g_failure_code;
+   END refresh_existing_records;
+
+   ------------------------------------------------------------------------------------------------
+   -- PROCEDURE    : ARCHIVE_SUCCESS_RECORDS
+   -- Description  : This procedure is used to archive the successful records
+   ------------------------------------------------------------------------------------------------
+   PROCEDURE archive_success_records(
+      x_retcode   OUT NUMBER
+    , x_errmsg    OUT VARCHAR2
+   )
+   IS
+      -- Declare local variables
+      l_archve_interval                            NUMBER := 15; -- Archive old records after days
+   BEGIN
+      -- Initialize out parameters
+      x_retcode   := g_success_code;
+      x_errmsg    := g_success;
+
+      -- Inserting successful and error records into archive table
+      BEGIN
+         INSERT INTO apps.$[![stg_tbl]!]_arch
+            SELECT stg.*
+                 , g_sysdate
+                 , g_request_id
+              FROM apps.$[![stg_tbl]!] stg
+             WHERE stg.processed_flag IN ('P');
+      EXCEPTION
+         WHEN OTHERS THEN
+            x_errmsg   := 'Error while archiving records. Error : ' || SQLERRM;
+            RAISE excp_custom;
+
+      END;
+
+      BEGIN
+         DELETE apps.$[![stg_tbl]!] stg
+          WHERE stg.processed_flag = 'P'
+                OR ( stg.processed_flag = 'E'
+                    AND stg.creation_date < g_sysdate - l_archve_interval );
+      EXCEPTION
+         WHEN OTHERS THEN
+            x_errmsg   := 'Error while deleting archived records. Error : ' || SQLERRM;
+            RAISE excp_custom;
+      END;
+
+      COMMIT;
+   EXCEPTION
+      WHEN excp_custom THEN
+         x_retcode   := g_failure_code;
+      WHEN OTHERS THEN
+         x_errmsg    := 'Error occured in archive_success_records procedure. Error : ' || SQLERRM;
+         x_retcode   := g_failure_code;
+   END archive_success_records;
+
+   ------------------------------------------------------------------------------------------------
+   -- PROCEDURE    : VALIDATE_STG_RECORDS
+   -- Description  : This procedure will perform validation fo Staging records.
+   ------------------------------------------------------------------------------------------------
+   PROCEDURE validate_stg_records(
+      x_retcode   OUT VARCHAR2
+    , x_errbuf    OUT VARCHAR2
+   )
+   IS
+      -- Declare cursors
+      -- Fetch the new records to validate
+      CURSOR cur_new_records
+      IS
+         SELECT *
+           FROM apps.$[![stg_tbl]!]
+          WHERE processed_flag = 'N';
+
+      -- Declare Out and exception variables
+      l_retcode                                    NUMBER := g_success_code;
+      l_errmsg                                     VARCHAR2( 4000 ) := g_success;
+      excp_skip                                    EXCEPTION;
+      -- Declare Varibales
+      $[![l_tbl_name]!]                         $[![t_type_name]!];
+   BEGIN
+      -- Initializing out parameters
+      g_proc_name   := 'validate_stg_records';
+      x_errbuf      := l_errmsg;
+      x_retcode     := l_retcode;
+      --
+      OPEN cur_new_records;
+      FETCH cur_new_records
+        BULK COLLECT INTO $[![l_tbl_name]!];
+
+      FOR indx IN 1 .. $[![l_tbl_name]!].COUNT
+      LOOP
+         -- Initializing Variables
+         $[![l_tbl_name]!]( indx ).last_update_date    := SYSDATE;
+         $[![l_tbl_name]!]( indx ).last_update_login   := g_login_id;
+         $[![l_tbl_name]!]( indx ).last_updated_by     := g_user_id;
+         $[![l_tbl_name]!]( indx ).processed_flag      := 'V';
+         $[![l_tbl_name]!]( indx ).error_message       := 'Validated';
+
+      END LOOP;
+
+      IF ( $[![l_tbl_name]!].COUNT > 0 ) THEN
+         BEGIN
+
+            FORALL indx IN 1 .. $[![l_tbl_name]!].COUNT
+               UPDATE apps.$[![stg_tbl]!]
+                  SET processed_flag      = $[![l_tbl_name]!]( indx ).processed_flag
+                    , error_message       = $[![l_tbl_name]!]( indx ).error_message
+                    , last_updated_by     = $[![l_tbl_name]!]( indx ).last_updated_by
+                    , last_update_date    = $[![l_tbl_name]!]( indx ).last_update_date
+                    , last_update_login   = $[![l_tbl_name]!]( indx ).last_update_login
+                WHERE $[![stg_id]!] = $[![l_tbl_name]!]( indx ).$[![stg_id]!];
+
+         EXCEPTION --Exception Block
+            WHEN OTHERS THEN
+               l_errmsg   := 'Error while Bulk updating the records, Error : ' || SQLERRM;
+               RAISE excp_custom;
+         END;
+      END IF;
+   EXCEPTION -- Exception block of Procedure
+      WHEN excp_custom THEN
+         ROLLBACK;
+         x_errbuf    := l_errmsg;
+         x_retcode   := l_retcode;
+         printlog( l_errmsg );
+      WHEN OTHERS THEN
+         ROLLBACK;
+         x_errbuf    := form_err_msg;
+         x_retcode   := g_failure_code;
+         printlog( x_errbuf );
+   END validate_stg_records;
+
+   ------------------------------------------------------------------------------------------------
+   -- PROCEDURE    : INSERT_INTF_RECRODS
+   -- Description  : This procedure will insert records from Staging tables into Interface tables.
+   ------------------------------------------------------------------------------------------------
+   PROCEDURE insert_intf_recrods(
+      x_retcode   OUT NUMBER
+    , x_errbuf    OUT VARCHAR2
+   )
+   IS
+      -- Declare cursors
+      CURSOR cur_valid_records
+      IS
+         SELECT *
+           FROM apps.$[![stg_tbl]!]
+          WHERE processed_flag = 'V';
+
+      -- Declare Out and exception variables
+      l_errmsg                                     VARCHAR2( 4000 ) := g_success;
+      excp_skip                                    EXCEPTION;
+      $[![l_tbl_name]!]                         $[![t_type_name]!];
+   -- Declare Varibales
+   BEGIN
+      -- Initializing out parameters
+      g_proc_name   := 'INSERT_INTF_RECRODS';
+      x_errbuf      := l_errmsg;
+      x_retcode     := g_success_code;
+
+      -- Bulk collect records into table type
+      OPEN cur_valid_records;
+      FETCH cur_valid_records
+        BULK COLLECT INTO $[![l_tbl_name]!];
+      CLOSE cur_valid_records;
+
+      -- Loop through the new records
+      FOR indx IN 1 .. $[![l_tbl_name]!].COUNT
+      LOOP
+         -- Initializing Variables
+         $[![l_tbl_name]!]( indx ).last_update_date    := SYSDATE;
+         $[![l_tbl_name]!]( indx ).last_update_login   := g_login_id;
+         $[![l_tbl_name]!]( indx ).last_updated_by     := g_user_id;
+         $[![l_tbl_name]!]( indx ).processed_flag      := 'I';
+         $[![l_tbl_name]!]( indx ).error_message       := 'Interfaced';
+
+         BEGIN
+            INSERT INTO $[![intf_table]!]( invoice_id
+                                             , invoice_num
+                                             , vendor_id
+                                             , vendor_site_id
+                                             , invoice_amount
+                                             , invoice_currency_code
+                                             , invoice_date
+                                             , description
+                                             , source
+                                             , org_id
+                                             , terms_id )
+            VALUES (
+                      $[![l_tbl_name]!]( indx ).invoice_id
+                    , $[![l_tbl_name]!]( indx ).invoice_number
+                    , $[![l_tbl_name]!]( indx ).vendor_id
+                    , $[![l_tbl_name]!]( indx ).vendor_site_id
+                    , $[![l_tbl_name]!]( indx ).invoice_currency_code
+                    , $[![l_tbl_name]!]( indx ).invoice_amount
+                    , $[![l_tbl_name]!]( indx ).invoice_date
+                    , $[![l_tbl_name]!]( indx ).description
+                    , $[![l_tbl_name]!]( indx ).source_code
+                    , $[![l_tbl_name]!]( indx ).org_id
+                    , $[![l_tbl_name]!]( indx ).terms_id
+                   );
+         EXCEPTION --Exception Block
+            WHEN OTHERS THEN
+               $[![l_tbl_name]!]( indx ).processed_flag   := 'E';
+               $[![l_tbl_name]!]( indx ).error_message    := 'Error while interfacing. Error : ' || SQLERRM;
+         END;
+      END LOOP;
+
+      IF ( $[![l_tbl_name]!].COUNT > 0 ) THEN
+         BEGIN
+
+            FORALL indx IN 1 .. $[![l_tbl_name]!].COUNT
+               UPDATE apps.$[![stg_tbl]!]
+                  SET processed_flag      = $[![l_tbl_name]!]( indx ).processed_flag
+                    , error_message       = $[![l_tbl_name]!]( indx ).error_message
+                    , last_updated_by     = $[![l_tbl_name]!]( indx ).last_updated_by
+                    , last_update_date    = $[![l_tbl_name]!]( indx ).last_update_date
+                    , last_update_login   = $[![l_tbl_name]!]( indx ).last_update_login
+                WHERE $[![stg_id]!] = $[![l_tbl_name]!]( indx ).$[![stg_id]!];
+
+         EXCEPTION --Exception Block
+            WHEN OTHERS THEN
+               l_errmsg   := 'Error while Bulk updating the records, Error : ' || SQLERRM;
+               RAISE excp_custom;
+         END;
+
+      END IF;
+
+   EXCEPTION -- Exception block of Procedure
+      WHEN excp_custom THEN
+         ROLLBACK;
+         x_errbuf    := l_errmsg;
+         x_retcode   := g_failure_code;
+      WHEN OTHERS THEN
+         ROLLBACK;
+         x_errbuf    := form_err_msg;
+         x_retcode   := g_failure_code;
+   END insert_intf_recrods;
+
+   ------------------------------------------------------------------------------------------------
+   -- PROCEDURE    : LAUNCH_INTF_PROG
+   -- Description  : This procedure will launch standard program to create Invoice.
+   ------------------------------------------------------------------------------------------------
+   PROCEDURE launch_intf_prog(
+      x_retcode   OUT NUMBER
+    , x_errbuf    OUT VARCHAR2
+   )
+   IS
+      -- Declare cursors
+      -- Declare Out and exception variables
+      l_errmsg                                     VARCHAR2( 4000 ) := g_success;
+      excp_skip                                    EXCEPTION;
+      -- Declare Varibales
+      l_request_id                                 NUMBER;
+   BEGIN
+      -- Initializing out parameters
+      g_proc_name   := 'LAUNCH_INTF_PROG';
+      x_errbuf      := l_errmsg;
+      x_retcode     := g_success_code;
+      -- Submit the request
+      l_request_id      :=
+         fnd_request.submit_request(
+                                     '$[![appl_short_name]!]' --Application Short Name
+                                   , '$[![prog_short_name]!]' -- Conc Program Short Name
+                                   , NULL --Description
+                                   , NULL --Start Time
+                                   , FALSE --Sub Request
+                                   , $[![arg1]!] --Argument1
+                                   , $[![arg2]!] --Argument2
+                                    );
+
+      IF ( l_request_id <> 0 ) THEN
+         -- Make a parent child relationship
+         BEGIN
+            UPDATE fnd_concurrent_requests
+               SET has_sub_request   = 'Y'
+             WHERE request_id = g_request_id;
+
+            UPDATE fnd_concurrent_requests
+               SET is_sub_request        = 'Y'
+                 , priority_request_id   = g_request_id
+                 , parent_request_id     = g_request_id
+             WHERE request_id = l_request_id;
+
+            COMMIT;
+         EXCEPTION
+            WHEN OTHERS THEN
+               printlog( form_err_msg );
+         END;
+
+         -- Wait for request
+         DECLARE
+            l_max_wait                                   NUMBER := 300; -- max wait time in seconds
+            l_interval                                   NUMBER := 60; -- interval time in seconds
+            l_phase_code                                 VARCHAR2( 15 );
+            l_status_code                                VARCHAR2( 15 );
+            x_dev_phase                                  VARCHAR2( 15 );
+            x_dev_status                                 VARCHAR2( 15 );
+            x_messages                                   VARCHAR2( 4000 );
+            l_status                                     BOOLEAN;
+         BEGIN
+            -- Wait for Child request completeion
+            l_status      :=
+               fnd_concurrent.wait_for_request(
+                                                request_id   => l_request_id
+                                              , interval     => l_interval -- Interval between checking the status of program
+                                              , max_wait     => l_max_wait -- Max wait time 0 means forever
+                                              , phase        => l_phase_code -- Program Phase
+                                              , status       => l_status_code -- Program Status
+                                              , dev_phase    => x_dev_phase -- COMPLETED
+                                              , dev_status   => x_dev_status -- NORMAL
+                                              , MESSAGE      => x_messages
+                                               );
+            IF ( x_dev_status <> 'NORMAL' ) THEN
+               l_errmsg   := 'Program request not completed Normal. Request id : ' || l_request_id;
+               RAISE excp_custom;
+            END IF;
+         END;
+      ELSE
+         l_errmsg   := 'Unable to submit the request. Error : ' || SQLERRM;
+         RAISE excp_custom;
+      END IF;
+
+   EXCEPTION -- Exception block of Procedure
+      WHEN excp_custom THEN
+         ROLLBACK;
+         x_errbuf    := l_errmsg;
+         x_retcode   := g_failure_code;
+      WHEN OTHERS THEN
+         ROLLBACK;
+         x_errbuf    := form_err_msg;
+         x_retcode   := g_failure_code;
+   END launch_intf_prog;
+
+   ------------------------------------------------------------------------------------------------
+   -- PROCEDURE    : UPDATE_INTF_RESULTS
+   -- Description  : This procedure will update the interface records with status after
+   --                completion of standard program.
+   ------------------------------------------------------------------------------------------------
+   PROCEDURE update_intf_results(
+      x_retcode   OUT NUMBER
+    , x_errbuf    OUT VARCHAR2
+   )
+   IS
+      -- Declare cursors
+      -- Fetch interfaced records
+      CURSOR cur_intf_records
+      IS
+         SELECT *
+           FROM apps.$[![stg_tbl]!]
+          WHERE processed_flag = 'I';
+
+      -- Fetch records from interface which are processed
+      CURSOR cur_processed_records
+      IS
+         SELECT *
+           FROM apps.$[![intf_table]!] intf
+          WHERE EXISTS
+                   (SELECT 1
+                      FROM apps.$[![stg_tbl]!] stg
+                     WHERE processed_flag = 'I'
+                           AND stg.invoice_id = intf.invoice_id);
+
+
+      -- Declare Out and exception variables
+      l_errmsg                                     VARCHAR2( 4000 ) := g_success;
+      excp_skip                                    EXCEPTION;
+      -- Declare Varibales
+      $[![l_tbl_name]!]                         $[![t_type_name]!];
+   BEGIN
+      -- Initializing out parameters
+      g_proc_name   := 'UPDATE_INTF_RESULTS';
+      x_errbuf      := g_success;
+      x_retcode     := g_success_code;
+      -- Bulk collect records
+      OPEN cur_intf_records;
+      FETCH cur_intf_records
+        BULK COLLECT INTO $[![l_tbl_name]!];
+      CLOSE cur_intf_records;
+
+      FOR indx IN 1 .. $[![l_tbl_name]!].COUNT
+      LOOP
+         -- Initializing Variables
+         $[![l_tbl_name]!]( indx ).last_update_date    := SYSDATE;
+         $[![l_tbl_name]!]( indx ).last_update_login   := g_login_id;
+         $[![l_tbl_name]!]( indx ).last_updated_by     := g_user_id;
+         $[![l_tbl_name]!]( indx ).processed_flag      := 'S';
+         $[![l_tbl_name]!]( indx ).error_message       := 'Processed Successfully';
+
+      END LOOP;
+
+      IF ( $[![l_tbl_name]!].COUNT > 0 ) THEN
+         BEGIN
+
+            FORALL indx IN 1 .. $[![l_tbl_name]!].COUNT
+               UPDATE apps.$[![stg_tbl]!] stg
+                  SET last_update_date    = $[![l_tbl_name]!]( indx ).last_update_date
+                    , last_updated_by     = $[![l_tbl_name]!]( indx ).last_updated_by
+                    , last_update_login   = $[![l_tbl_name]!]( indx ).last_update_login
+                    , request_id          = $[![l_tbl_name]!]( indx ).request_id
+                    , processed_flag      = $[![l_tbl_name]!]( indx ).processed_flag
+                    , error_message       = $[![l_tbl_name]!]( indx ).error_message
+                WHERE stg.$[![stg_id]!] = $[![l_tbl_name]!]( indx ).$[![stg_id]!];
+
+         EXCEPTION --Exception Block
+            WHEN OTHERS THEN
+               l_errmsg   := 'Error while bulk update. Error : ' || SQLERRM;
+               RAISE excp_custom;
+         END;
+      END IF;
+   EXCEPTION -- Exception block of Procedure
+      WHEN excp_custom THEN
+         ROLLBACK;
+         x_errbuf    := l_errmsg;
+         x_retcode   := g_failure_code;
+      WHEN OTHERS THEN
+         ROLLBACK;
+         x_errbuf    := form_err_msg;
+         x_retcode   := g_failure_code;
+   END update_intf_results;
+
+   ------------------------------------------------------------------------------------------------
+   -- PROCEDURE    : disp_error_records
+   -- Description  : This procedure will Display the errored records.
+   ------------------------------------------------------------------------------------------------
+   PROCEDURE disp_error_records
+   IS
+      -- Declare cursors
+      CURSOR cur_error_records
+      IS
+         SELECT *
+           FROM apps.$[![stg_tbl]!]
+          WHERE processed_flag = 'E'
+                AND request_id = g_request_id;
+
+      -- Declare Out and exception variables
+      -- Declare Varibales
+      l_delimiter                                  NUMBER := 5;
+      l_header_msg                                 VARCHAR2( 4000 );
+   BEGIN
+      printlog( '' );
+      printlog( 'Records Errored out in Staging table :' );
+      printlog( '+-------------------------------------------------------------------------+' );
+
+      FOR cur_error_records_rec IN cur_error_records
+      LOOP
+         l_header_msg      :=
+               'Record Id : '
+            || cur_error_records_rec.$[![stg_id]!]
+            || '. Invoice : '
+            || cur_error_records_rec.invoice_number
+            || '. Processed Flag : '
+            || cur_error_records_rec.processed_flag
+            || '. Error : '
+            || cur_error_records_rec.error_message;
+
+         printlog( LPAD( ' ', 1 * l_delimiter ) || l_header_msg );
+
+      END LOOP; -- End cur_error_records
+
+      printlog( '+-------------------------------------------------------------------------+' );
+      printlog( '' );
+   EXCEPTION -- Exception block of Procedure
+      WHEN OTHERS THEN
+
+         printlog( form_err_msg );
+   END disp_error_records;
+
+   ------------------------------------------------------------------------------------------------
+   -- PROCEDURE    : MAIN
+   -- Description  : This procedure is used to submit the program attached with Executable.
+   ------------------------------------------------------------------------------------------------
+   PROCEDURE main(
+      errbuf           OUT NOCOPY VARCHAR2
+    , retcode          OUT NOCOPY NUMBER
+    , p_$[![param]!]   IN            NUMBER
+   )
+   IS
+      -- Error code and Exception variables
+      l_retcode                                    NUMBER := g_success_code;
+      l_errmsg                                     VARCHAR2( 4000 ) := g_success;
+      excp_skip                                    EXCEPTION;
+   -- User Defined variables
+   -- Declare Cursors
+   BEGIN
+      -- Initializing out parameters
+      g_proc_name   := 'MAIN';
+      errbuf        := l_errmsg;
+      retcode       := l_retcode;
+      printlog( '================================================================================================' );
+      printlog( '-------------------------------- Main procedure of the package -----------------------------' );
+      printlog( '---- p_$[![param]!]          : ' || p_$[![param]!] );
+      printlog( '================================================================================================' );
+
+      printlog( '' );
+      printlog( 'Populating Staging tables...' );
+      populate_staging_tables( x_retcode => l_retcode, x_errmsg => l_errmsg );
+
+      -- Check procedure status
+      IF ( l_retcode <> g_success_code ) THEN
+         printlog( l_errmsg );
+         RAISE excp_skip;
+      END IF;
+
+      -- Refresh existing records
+      printlog( '' );
+      printlog( 'Refreshing existing records.' );
+      refresh_existing_records( x_retcode => l_retcode, x_errmsg => l_errmsg );
+
+      -- Archive statging tables
+      printlog( '' );
+      printlog( 'Archive Staging tables...' );
+      archive_success_records( x_retcode => l_retcode, x_errmsg => l_errmsg );
+
+      printlog( '' );
+      printlog( 'Validating the records in Staging Table...' );
+      validate_stg_records( x_retcode => l_retcode, x_errbuf => l_errmsg );
+      -- Check procedure status
+      IF ( l_retcode <> g_success_code ) THEN
+         printlog( l_errmsg );
+         RAISE excp_skip;
+      END IF;
+
+      printlog( '' );
+      printlog( 'Entering Validated records into Interface table...' );
+      insert_intf_recrods( x_retcode => l_retcode, x_errbuf => l_errmsg );
+      -- Check procedure status
+      IF ( l_retcode <> g_success_code ) THEN
+         printlog( l_errmsg );
+         RAISE excp_skip;
+      END IF;
+
+      printlog( '' );
+      printlog( 'Launching Standard Prgram to Process Interface records...' );
+      launch_intf_prog( x_retcode => l_retcode, x_errbuf => l_errmsg );
+      -- Check procedure status
+      IF ( l_retcode <> g_success_code ) THEN
+         printlog( l_errmsg );
+         RAISE excp_skip;
+      END IF;
+
+      printlog( '' );
+      printlog( 'Updating status of records...' );
+      update_intf_results( x_retcode => l_retcode, x_errbuf => l_errmsg );
+      -- Check procedure status
+      IF ( l_retcode <> g_success_code ) THEN
+         printlog( l_errmsg );
+         RAISE excp_custom;
+      END IF;
+
+      -- Display error records if any failed
+      printlog( '' );
+      disp_error_records;
+
+   EXCEPTION -- Exception block of MAIN
+      WHEN excp_custom THEN
+         ROLLBACK;
+         errbuf    := l_errmsg;
+         retcode   := l_retcode;
+         -- Print the error details in the log file
+         printlog( errbuf );
+      WHEN OTHERS THEN
+         ROLLBACK;
+         errbuf    := 'When others exception occured in Main Procedure. Error :' || SQLERRM;
+         retcode   := g_failure_code;
+         -- Print the error details in the log file
+         printlog( errbuf );
+   END main;
+END $[![package]!];
+/
+
+SHOW ERROR
+/
+[>END<]!$[FingerTextData FingerTextData]@#
+crgeterror
+Lang:SQL
+   -- Form error message
+   FUNCTION geterror
+      RETURN VARCHAR2
+   IS
+   BEGIN
+      RETURN 'Error in ' || g_package_name || '.' || g_proc_name || ' : ' || SQLERRM;
+   END;
+[>END<]!$[FingerTextData FingerTextData]@#
+crfunc
+Lang:SQL
+   ------------------------------------------------------------------------------------------------
+   -- Function     : $[![func]!]
+   -- Description  : This Function will $[![description]!]
+   ------------------------------------------------------------------------------------------------
+   FUNCTION $[![func]!]( $[![param]!] IN $[![param_type]!] )
+      RETURN $[![return_type]!]
+   IS
+      -- Declare Cursors
+      -- Error code and Exception variables
+      l_errmsg                                     VARCHAR2( 4000 ) := NULL;
+      -- Declare Variables
+      $[![variable]!]                            $[![return_type]!]($[0[]0]);
+   BEGIN
+      -- Initialize 
+      g_proc_name                               := '$[![func]!]';
+      -- Return value
+      RETURN $[![variable]!];
+   EXCEPTION
+      WHEN OTHERS
+      THEN
+         RETURN NULL;
+   END $[![func]!];
+[>END<]!$[FingerTextData FingerTextData]@#
+crdebuglog
+Lang:SQL
+   ------------------------------------------------------------------------------------------------
+   -- PROCEDURE    : DEBUG_LOG
+   -- Description  : This Procedur will make entries into amit_debug
+   ------------------------------------------------------------------------------------------------
+   PROCEDURE debug_log( p_message IN VARCHAR2 )
+   IS
+      PRAGMA AUTONOMOUS_TRANSACTION;
+   BEGIN
+      INSERT INTO amit_debug
+      VALUES (
+                '$[![default]!]'
+              , p_message
+              , SYSDATE
+             );
+      COMMIT;
+   END debug_log;
+[>END<]!$[FingerTextData FingerTextData]@#
+case
+Lang:SQL
+CASE ()
+   WHEN ($[![cond1]!]) THEN
+      $[![stmt1]!]
+   WHEN ($[![cond2]!]) THEN
+      $[![stmt2]!]
+   ELSE
+
+END CASE;
+[>END<]!$[FingerTextData FingerTextData]@#
+callproc
+Lang:SQL
+      printlog( '$[![comments]!]...' );
+      $[![proc]!](
+                               x_retcode            => l_retcode
+                             , x_errmsg             => l_errmsg
+                             , $[![p1]!]   => $[![p1_value]!]
+                              );
+
+      -- Check procedure status
+      IF ( l_retcode <> g_success_code ) THEN
+         printlog( l_errmsg );
+         RAISE excp_custom;
+      END IF;
+[>END<]!$[FingerTextData FingerTextData]@#
+beg
+Lang:SQL
+BEGIN      
+   $[0[]0];
+EXCEPTION --Exception Block   
+   WHEN NO_DATA_FOUND THEN
+      printlog('No Data Found');
+   WHEN OTHERS THEN
+      printlog('Error while . Error : '||sqlerrm);
+END;
+[>END<]!$[FingerTextData FingerTextData]@#
+while
+Lang:MATLAB
+while $[![{condition}]!]
+   $[![]!]
+end[>END<]!$[FingerTextData FingerTextData]@#
+warning
+Lang:MATLAB
+warning('$[![{Description}]!]');[>END<]!$[FingerTextData FingerTextData]@#
+title
+Lang:MATLAB
+title('$[![{title 1}]!]');[>END<]!$[FingerTextData FingerTextData]@#
+template
+Lang:MATLAB
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
+% Ext:           $[![$[1[(key)FILENAME]1]]!]
+% 
+% Description:    $[![To be specified ...... ]!]
+% 
+% Inputs:         $[![To be specified ...... ]!]
+% 
+% Outputs:        $[![To be specified ...... ]!]
+% 
+% Date Created:   $[1[(key)DATE:yyyyMMdd]1]
+% 
+% Author:         $[![{your name}]!]
+% 
+% License:        $[![No License]!]
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+try
+  % Main code here
+  $[![]!]
+catch
+  % Exception handling here
+end[>END<]!$[FingerTextData FingerTextData]@#
+if
+Lang:MATLAB
+if $[![{condition}]!],
+  $[![]!]
+end[>END<]!$[FingerTextData FingerTextData]@#
+function
+Lang:MATLAB
+function [ $[![{output}]!] ] = $[![{Function Name}]!]( $[![{input}]!] )
+  $[![]!]
+end[>END<]!$[FingerTextData FingerTextData]@#
+for
+Lang:MATLAB
+for $[![i]!]=$[![1]!]:$[![n]!]
+   $[![]!]
+end[>END<]!$[FingerTextData FingerTextData]@#
+wbfind
+Lang:JAVA
+webBean.findChildRecursive("$[0[]0]");
+[>END<]!$[FingerTextData FingerTextData]@#
+vocreaterow
+Lang:JAVA
+if ($[![var]!] != null  && !"".equals($[![var]!])) {
+    whereClause.append(" AND $[0[]0] = :" + ++count);
+    whereClauseParams.add($[![var]!]);
+}
+if ($[![vo]!] != null) {
+    $[![vo]!].setMaxFetchSize(0); // not fetching any row
+    $[![vo]!].executeQuery(); // execute query for no rows
+    $[![vo]!].clearCache();
+
+    // create a new row  and set the values
+    $[![]!]  $[![row]!] = $[![]!] $[![vo]!].createRow();
+    $[![row]!].setNewRowState(Row.STATUS_INITIALIZED);
+
+    //insert the record
+    $[![vo]!].insertRow($[![row]!]);
+
+    // Set the attributes
+    // TODO 
+
+    // set new row as current row
+    $[![vo]!].setCurrentRow($[![row]!]);
+}
+[>END<]!$[FingerTextData FingerTextData]@#
+voaddclause
+Lang:JAVA
+if ($[![var]!] != null  && !"".equals($[![var]!])) {
+    whereClause.append(" AND $[0[]0] = :" + ++count);
+    whereClauseParams.add($[![var]!]);
+}
+[>END<]!$[FingerTextData FingerTextData]@#
+sop
+Lang:JAVA
+System.out.println("$[0[]0]");
+[>END<]!$[FingerTextData FingerTextData]@#
+oafwarn
+Lang:JAVA
+throw new OAException("$[0[]0]", OAException.WARNING)
+[>END<]!$[FingerTextData FingerTextData]@#
+oafinfo
+Lang:JAVA
+throw new OAException("$[0[]0]", OAException.INFORMATION)
+[>END<]!$[FingerTextData FingerTextData]@#
+oaferr
+Lang:JAVA
+throw new OAException("$[0[]0]", OAException.ERROR)
+[>END<]!$[FingerTextData FingerTextData]@#
+oafam
+Lang:JAVA
+OAApplicationModuleImpl $[0[]0] = (OAApplicationModuleImpl)pageContext.getApplicationModule(webBean);
+[>END<]!$[FingerTextData FingerTextData]@#
+oaexcp
+Lang:JAVA
+throw new OAException("$[0[]0]", OAException.ERROR)
+[>END<]!$[FingerTextData FingerTextData]@#
+template
+Lang:CPP
+ //============================================================================
+// Name         : $[![$[1[(key)FILENAME]1]]!]
+// Author       : $[![{your name}]!]
+// Version      : $[![{Version}]!]
+// Date         : $[1[(key)DATE:yyyyMMdd]1]  
+// License      : $[![No License]!]
+// Description  : $[![To be added........]!]
+//============================================================================
+
+#include <stdio.h>
+
+int main() {
+    $[![{Body}]!]
+    return 0;
+}
+[>END<]!$[FingerTextData FingerTextData]@#
+switch
+Lang:CPP
+switch ($[![{Key}]!]) 
+{
+  	case $[![{Value}]!]:
+		    $[![{Body}]!]
+		    break;
+	  default:
+        $[![{default}]!]
+		    break;
+}[>END<]!$[FingerTextData FingerTextData]@#
+main
+Lang:CPP
+int main(int argc, char* argv[]) 
+{
+	  $[![[Body]]!]
+}[>END<]!$[FingerTextData FingerTextData]@#
+if
+Lang:CPP
+if ($[![{condition}]!])
+{
+  $[![{Body 1}]!]
+} else
+{
+  $[![{Body 2}]!]
+}[>END<]!$[FingerTextData FingerTextData]@#
+helloworld
+Lang:CPP
+//============================================================================
+ // Name         : HelloWorld.cpp
+ // Author       : 
+ // Version      : 
+ // Date         : 
+ // License      : 
+ // Description  : Hello World in C++
+ //============================================================================
+ 
+#include <iostream>
+using namespace std;
+
+int main() {
+    cout << "!!!Hello World!!!" << endl; 
+    cin.get();
+    return 0;
+}
+[>END<]!$[FingerTextData FingerTextData]@#
+for
+Lang:CPP
+int $[![i]!] = 0;
+for ( $[![i]!]= 0; $[![{Condition}]!]; ++$[![i]!]) {
+	  $[![{Body}]!]
+}[>END<]!$[FingerTextData FingerTextData]@#
+do
+Lang:CPP
+do
+{ 
+	$[![{Body}]!] 
+} while ($[![{Condition}]!]);[>END<]!$[FingerTextData FingerTextData]@#
+cout
+Lang:CPP
+cout << "$[![{Text}]!]" << endl;[>END<]!$[FingerTextData FingerTextData]@#
+template
+Lang:C
+ //============================================================================
+// Name         : $[![$[1[(key)FILENAME]1]]!]
+// Author       : $[![{your name}]!]
+// Version      : $[![{Version}]!]
+// Date         : $[1[(key)DATE:yyyyMMdd]1]  
+// License      : $[![No License]!]
+// Description  : $[![To be added........]!]
+//============================================================================
+
+#include <stdio.h>
+
+int main() {
+    $[![{Body}]!]
+    return 0;
+}
+[>END<]!$[FingerTextData FingerTextData]@#
+switch
+Lang:C
+switch ($[![{Key}]!]) 
+{
+  	case $[![{Value}]!]:
+		    $[![{Body}]!]
+		    break;
+	  default:
+        $[![{default}]!]
+		    break;
+}[>END<]!$[FingerTextData FingerTextData]@#
+main
+Lang:C
+int main(int argc, char* argv[]) 
+{
+	  $[![[Body]]!]
+}[>END<]!$[FingerTextData FingerTextData]@#
+if
+Lang:C
+if ($[![{condition}]!])
+{
+  $[![{Body 1}]!]
+} else
+{
+  $[![{Body 2}]!]
+}[>END<]!$[FingerTextData FingerTextData]@#
+helloworld
+Lang:C
+//============================================================================
+ // Name         : HelloWorld.cpp
+ // Author       : 
+ // Version      : 
+ // Date         : 
+ // License      : 
+ // Description  : Hello World in C
+ //============================================================================
+ 
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+  	puts("!!!Hello World!!!");
+  	return EXIT_SUCCESS;
+}
+[>END<]!$[FingerTextData FingerTextData]@#
+for
+Lang:C
+int $[![i]!] = 0;
+for ( $[![i]!]= 0; $[![{Condition}]!]; ++$[![i]!]) {
+	  $[![{Body}]!]
+}[>END<]!$[FingerTextData FingerTextData]@#
+do
+Lang:C
+do
+{ 
+	$[![{Body}]!] 
+} while ($[![{Condition}]!]);[>END<]!$[FingerTextData FingerTextData]@#
+while
+Lang:BASH
+while $[![case]!]; do
+    $[0[]0]
+done
+[>END<]!$[FingerTextData FingerTextData]@#
+script_tkprof
+Lang:BASH
+for FILE in `ls betsy*AM_20140814_TRIG*.trc`
+do
+   FILE_NAME=`echo ${FILE} | cut -d "." -f1`
+   echo "File name : ${FILE_NAME}"
+   tkprof ${FILE} /export/home/amaindo1/${FILE_NAME}.tkp sort=prsela,exeela,fchela
+   zip /export/home/amaindo1/${FILE_NAME}.zip ${FILE}
+done
+[>END<]!$[FingerTextData FingerTextData]@#
+isfile
+Lang:BASH
+echo "Checking if file exists ... ${$[![file]!]}"
+if [ -f "${$[![file]!]}" ]
+then
+   echo "File exists, processing..."
+else
+   echo "File not Present."
+fi
+[>END<]!$[FingerTextData FingerTextData]@#
+isdir
+Lang:BASH
+echo "Checking if path exists ... ${$[![dir]!]}"
+if [ -d "${$[![dir]!]}" ]
+then
+   echo "Directory exists."
+else
+   echo "Directory does not exists."
+fi
+[>END<]!$[FingerTextData FingerTextData]@#
+inn
+Lang:BASH
+if [ -n "${$[![str]!]}" ]
+then
+   $[0[]0]
+else
+   echo "No value passed."
+fi
+[>END<]!$[FingerTextData FingerTextData]@#
+ife
+Lang:BASH
+if [ $[![case]!] ] 
+then
+    $[![cmd]!]
+else 
+    $[0[]0]
+fi
+[>END<]!$[FingerTextData FingerTextData]@#
+if
+Lang:BASH
+if [ $[![case]!] ] 
+then
+    $[0[]0]
+fi
+[>END<]!$[FingerTextData FingerTextData]@#
+for
+Lang:BASH
+for $[![var]!] in $[![value]!]; do
+    $[0[]0]
+done
+[>END<]!$[FingerTextData FingerTextData]@#
+find
+Lang:BASH
+find ./ -name "$[![pattern]!]" -exec rm -i {} \;
+[>END<]!$[FingerTextData FingerTextData]@#
+elif
+Lang:BASH
+elif [ $[![default]!] ] 
+then
+    $[0[]0]
+[>END<]!$[FingerTextData FingerTextData]@#
+echo
+Lang:BASH
+echo "$[0[]0]"[>END<]!$[FingerTextData FingerTextData]@#
+cmdstus
+Lang:BASH
+# Check the command status
+if [ $? -ne 0 ] 
+then
+    echo "$[0[]0]"
+fi
+[>END<]!$[FingerTextData FingerTextData]@#
+wfldtupld
+GLOBAL
+############################ UPLOAD COMMANDS ############################
+## Workflow Upload
+WFLOAD apps/$APPS_PASS 0 Y FORCE $[![wf_file]!].wft
+WFLOAD apps/$APPS_PASS 0 Y UPLOAD  $[![wf_file]!].wft
+WFLOAD apps/$APPS_PASS 0 Y UPGRADE  $[![wf_file]!].wft
+[>END<]!$[FingerTextData FingerTextData]@#
+wfldtdown
+GLOBAL
+############################ DOWNLOAD COMMANDS ############################
+## Workflow dowload
+WFLOAD apps/$APPS_PASS 0 Y DOWNLOAD $[![wf_file]!].wft $[![item_type]!]
+[>END<]!$[FingerTextData FingerTextData]@#
+time
+GLOBAL
+$[![(key)TIME:HH:mm:ss]!][>END<]!$[FingerTextData FingerTextData]@#
+shebang
+GLOBAL
+#!/usr/bin/env[>END<]!$[FingerTextData FingerTextData]@#
+oarender
+GLOBAL
+${oa.MOCRequestEOVO1.DisableChanges}[>END<]!$[FingerTextData FingerTextData]@#
+oapagebutton
+GLOBAL
+            <oa:pageButtonBar id="PageButtonBarRN">
+               <ui:contents>
+                  <oa:submitButton id="SaveBtn" text="Save" use="/oracle/apps/fnd/attributesets/Buttons/Apply" prompt="Save" shortDesc="Click to Save Work Request" />
+                  <oa:button id="Cancel" text="Cancel" prompt="Cancel" shortDesc="Go Back" serverUnvalidated="false">
+                     <ui:primaryClientAction>
+                        <ui:firePartialAction event="GoBack" id="firePartialAction112" unvalidated="true"/>
+                     </ui:primaryClientAction>
+                  </oa:button>
+                  <oa:submitButton id="SubmitBtn" text="Submit" use="/oracle/apps/fnd/attributesets/Buttons/Submit" prompt="Submit"/>
+               </ui:contents>
+            </oa:pageButtonBar>
+[>END<]!$[FingerTextData FingerTextData]@#
+oanewcol
+GLOBAL
+            <oa:column id="$[![column]!]Column">
+               <ui:columnHeader>
+                  <oa:sortableHeader id="$[![column]!]Header" prompt="$[![prompt]!]" shortDesc="$[![prompt]!]"/>
+               </ui:columnHeader>
+               <ui:contents>
+                  <oa:messageStyledText id="$[![column]!]" viewAttr="$[0[]0]" prompt="$[![prompt]!]"/>
+               </ui:contents>
+            </oa:column>
+[>END<]!$[FingerTextData FingerTextData]@#
+oajsp
+GLOBAL
+OA.jsp?page=/xxcust/oracle/apps/$[![path]!]/webui/$[![page]!]&amp;retainAM=Y&amp;addBreadCrumb=Y&amp;MOC_ID={@MocId}[>END<]!$[FingerTextData FingerTextData]@#
+oaf_import_page
+GLOBAL
+java oracle.jrad.tools.xml.importer.XMLImporter $JAVA_TOP/xxcust/oracle/apps/$[![path]!]/webui/$[![pagename]!].xml -jdk13 -mmddir $OA_HTML/jrad -username apps -password $[![apps]!] -rootdir $JAVA_TOP/ -dbconnection "(description = (address_list = (address = (community =tcp.world)(protocol = tcp)(host =192.168.17.45)(port = 1542)))(connect_data = (sid = SDEV)))"
+[>END<]!$[FingerTextData FingerTextData]@#
+oaf_bounce
+GLOBAL
+# Go to the custom path where class file is present run adcgnjar
+# Goto admin scripts folder
+cd $ADMIN_SCRIPTS_HOME
+# Bounce ORA CORE welcome1
+$ADMIN_SCRIPTS_HOME/admanagedsrvctl.sh stop oacore_server1
+$ADMIN_SCRIPTS_HOME/admanagedsrvctl.sh start oacore_server1
+
+# Apache bounce
+$ADMIN_SCRIPTS_HOME/adapcctl.sh stop
+$ADMIN_SCRIPTS_HOME/adapcctl.sh start
+
+# OC4J Bounce | Not required
+$ADMIN_SCRIPTS_HOME/adoacorectl.sh stopall
+$ADMIN_SCRIPTS_HOME/adoacorectl.sh startall
+[>END<]!$[FingerTextData FingerTextData]@#
+npp
+GLOBAL
+Notepad++
+[>END<]!$[FingerTextData FingerTextData]@#
+filename
+GLOBAL
+$[![(key)FILENAME]!]$[![(key)EXTNAME]!][>END<]!$[FingerTextData FingerTextData]@#
+exec
+GLOBAL
+$[![(run)$[![{type a command (e.g. dir) and hit TAB}]!]]!][>END<]!$[FingerTextData FingerTextData]@#
+evaluate
+GLOBAL
+$[![(eva)$[![{type a math expression (e.g. 1+1) and hit TAB}]!]]!][>END<]!$[FingerTextData FingerTextData]@#
+dir
+GLOBAL
+$[![(key)DIRECTORY]!][>END<] !$[FingerTextData FingerTextData]@#
+date
+GLOBAL
+$[![(key)DATE:yyyy/MM/dd]!][>END<]!$[FingerTextData FingerTextData]@#
+LDT_UPLOAD
+GLOBAL
+############################ UPLOAD COMMANDS ############################
+
+## Concurrent Program
+$FND_TOP/bin/FNDLOAD apps/$APPS_PASS 0 Y UPLOAD $FND_TOP/patch/115/import/afcpprog.lct XXECS_OB_PO_INTERFACE_PROG.ldt
+
+##  Request Groups
+$FND_TOP/bin/FNDLOAD apps/$APPS_PASS O Y UPLOAD $FND_TOP/patch/115/import/afcpreqg.lct file_name_RG.ldt
+
+##  Request Sets
+$FND_TOP/bin/FNDLOAD apps/$APPS_PASS O Y UPLOAD $FND_TOP/patch/115/import/afcprset.lct file_name_RS.ldt
+
+##  Responsibilities
+$FND_TOP/bin/FNDLOAD apps/$APPS_PASS O Y UPLOAD $FND_TOP/patch/115/import/afscursp.lct XXAMT_CUST_RESP.ldt
+
+##  Menus
+$FND_TOP/bin/FNDLOAD apps/$APPS_PASS O Y UPLOAD $FND_TOP/patch/115/import/afsload.lct file_name_MN.ldt
+
+##  Function
+$FND_TOP/bin/FNDLOAD apps/$APPS_PASS 0 Y UPLOAD $FND_TOP/patch/115/import/afsload.lct file_name_FUNC.ldt CUSTOM_MODE=FORCE
+
+##  Form
+$FND_TOP/bin/FNDLOAD apps/$APPS_PASS 0 Y UPLOAD $FND_TOP/patch/115/import/afsload.lct file_name_FORM.ldt
+
+## Value Set
+$FND_TOP/bin/FNDLOAD apps/$APPS_PASS 0 Y UPLOAD $FND_TOP/patch/115/import/afffload.lct XX_CUSTOM_VS.ldt - WARNING=YES UPLOAD_MODE=REPLACE CUSTOM_MODE=FORCE
+
+## Lookups 
+$FND_TOP/bin/FNDLOAD apps/$APPS_PASS 0 Y UPLOAD $FND_TOP/patch/115/import/aflvmlu.lct XXECS_DIST_OB_PO_MAIN_LOOKUP.ldt CUSTOM_MODE=FORCE
+
+## DFF against Lookup
+$FND_TOP/bin/FNDLOAD apps/$APPS_PASS 0 Y UPLOAD $FND_TOP/patch/115/import/afffload.lct XXECS_DIST_OB_PO_MAIN_LOOKUP_DFF.ldt
+
+##  Key Flexfield Structures
+$FND_TOP/bin/FNDLOAD apps/$APPS_PASS O Y UPLOAD $FND_TOP/patch/115/import/afffload.lct file_name_KFF.ldt
+
+## Profile 
+$FND_TOP/bin/FNDLOAD apps/$APPS_PASS 0 Y UPLOAD $FND_TOP/patch/115/import/afscprof.lct XXECS_OB_PO_DEBUG_FLAG.ldt
+
+##  Alerts
+$FND_TOP/bin/FNDLOAD apps/$APPS_PASS 0 Y UPLOAD $ALR_TOP/patch/115/import/alr.lct XX_CUSTOM_ALR.ldt CUSTOM_MODE=FORCE
+
+##  Messages
+$FND_TOP/bin/FNDLOAD apps/$APPS_PASS O Y UPLOAD $FND_TOP/patch/115/import/afmdmsg.lct file_name.ldt
+
+
+##  Workflow
+WFLOAD apps/$APPS_PASS 0 Y FORCE ECS_PO_APPROVAL.wft
+WFLOAD apps/$APPS_PASS 0 Y UPLOAD  XXDBDWSHDEL.wft
+WFLOAD apps/$APPS_PASS 0 Y UPGRADE  XXDBDWSHDEL.wft
+
+## BI Publisher ##  Definitions
+FNDLOAD apps/$APPS_PASS 0 Y UPLOAD $XDO_TOP/patch/115/import/xdotmpl.lct XXDOPOPRRTRNDATA_BI.ldt
+
+##  XML Data definition File
+java oracle.apps.xdo.oa.util.XDOLoader UPLOAD \
+ -DB_USERNAME apps \
+ -DB_PASSWORD $APPS_PASS \
+ -JDBC_CONNECTION 192.168.17.38:1523:CLONE \
+ -APPS_SHORT_NAME XXCUST \
+ -LOB_TYPE DATA_TEMPLATE \
+ -LOB_CODE XXDOPOPRRTRNDATA \
+ -XDO_FILE_TYPE XML \
+ -FILE_CONTENT_TYPE 'text/html' \
+ -FILE_NAME ECS_AR_SUN_CANADA_UPLIFT_REPORT.xml \
+ -CUSTOM_MODE FORCE 
+
+##  RTF template File
+ java oracle.apps.xdo.oa.util.XDOLoader UPLOAD \
+ -DB_USERNAME apps \
+ -DB_PASSWORD $APPS_PASS \
+ -JDBC_CONNECTION 192.168.17.38:1523:CLONE \
+ -APPS_SHORT_NAME XXCUST \
+ -LOB_TYPE TEMPLATE \
+ -LOB_CODE XXDOPOPRRTRNDATA \
+ -LANGUAGE en \
+ -TERRITORY US \
+ -XDO_FILE_TYPE RTF \
+ -FILE_CONTENT_TYPE 'application/rtf' \
+ -FILE_NAME ECS_AR_SUN_CANADA_UPLIFT_REPORT.rtf \
+ -CUSTOM_MODE FORCE 
+ 
+##  Excel template File
+ java oracle.apps.xdo.oa.util.XDOLoader UPLOAD \
+ -DB_USERNAME apps \
+ -DB_PASSWORD $APPS_PASS \
+ -JDBC_CONNECTION 192.168.17.38:1523:CLONE \
+ -APPS_SHORT_NAME XXCUST \
+ -LOB_TYPE TEMPLATE \
+ -LOB_CODE XXDOPOPRRTRNDATA \
+ -LANGUAGE en \
+ -TERRITORY US \
+ -XDO_FILE_TYPE XLS \
+ -FILE_CONTENT_TYPE 'application/vnd.ms-excel' \
+ -FILE_NAME ECS_AR_SUN_CANADA_UPLIFT_REPORT.xls \
+ -CUSTOM_MODE FORCE  
+
+[>END<]!$[FingerTextData FingerTextData]@#
+LDT_DOWNLOAD
+GLOBAL
+########################## DOWNLOAD COMMANDS ##########################
+
+## Concurrent Program
+$FND_TOP/bin/FNDLOAD apps/$APPS_PASS 0 Y DOWNLOAD $FND_TOP/patch/115/import/afcpprog.lct XXDOCONDWR_CP.ldt PROGRAM APPLICATION_SHORT_NAME="XXCUST" CONCURRENT_PROGRAM_NAME="XXDOCONDWR"  
+
+## Request Groups
+$FND_TOP/bin/FNDLOAD apps/$APPS_PASS O Y DOWNLOAD $FND_TOP/patch/115/import/afcpreqg.lct file_name_RG.ldt REQUEST_GROUP REQUEST_GROUP_NAME="All Requests" APPLICATION_SHORT_NAME="FND" 
+
+## Request Groups to add a program
+$FND_TOP/bin/FNDLOAD apps/$APPS_PASS O Y DOWNLOAD $FND_TOP/patch/115/import/afcpreqg.lct XXDOJEAPPRVSTATUS_RG.ldt REQUEST_GROUP REQUEST_GROUP_NAME="GL Concurrent Program Group" APPLICATION_SHORT_NAME="SQLGL" REQUEST_GROUP_UNIT UNIT_APP="XXCUST" UNIT_TYPE='P' UNIT_NAME="XXDOJEAPPRVSTATUS"
+
+## Request Sets
+$FND_TOP/bin/FNDLOAD apps/$APPS_PASS O Y DOWNLOAD $FND_TOP/patch/115/import/afcprset.lct file_name_RS.ldt REQ_SET
+APPLICATION_SHORT_NAME="FND" REQUEST_SET_NAME="request set"
+
+## Responsibilities
+$FND_TOP/bin/FNDLOAD apps/$APPS_PASS O Y DOWNLOAD $FND_TOP/patch/115/import/afscursp.lct XXAMT_CUST_RESP.ldt FND_RESPONSIBILITY RESP_KEY="XXAMT_CUST"
+
+## Menus
+$FND_TOP/bin/FNDLOAD apps/$APPS_PASS O Y DOWNLOAD $FND_TOP/patch/115/import/afsload.lct file_name_MN.ldt MENU MENU_NAME="menu_name"
+
+## Function
+$FND_TOP/bin/FNDLOAD apps/$APPS_PASS 0 Y DOWNLOAD $FND_TOP/patch/115/import/afsload.lct file_name_FUNC.ldt FUNCTION FUNCTION_NAME='XXDO_MOCF_CREUPD_FUNC'
+
+## Forms
+$FND_TOP/bin/FNDLOAD apps/$APPS_PASS 0 Y DOWNLOAD $FND_TOP/patch/115/import/afsload.lct file_name_FUNC.ldt FORM FORM_NAME='XXDO_MOCF_CREUPD_FORM'
+
+## Value Set
+$FND_TOP/bin/FNDLOAD apps/$APPS_PASS 0 Y DOWNLOAD $FND_TOP/patch/115/import/afffload.lct XX_CUSTOM_VS.ldt VALUE_SET FLEX_VALUE_SET_NAME="EMR_TRAX_ORACLE_IB_JDI_OU"
+
+## Lookup 
+$FND_TOP/bin/FNDLOAD apps/$APPS_PASS 0 Y DOWNLOAD $FND_TOP/patch/115/import/aflvmlu.lct  EMR_TRAX_ORACLE_IB_JDI_OU_LKP.ldt FND_LOOKUP_TYPE APPLICATION_SHORT_NAME="XXOM" LOOKUP_TYPE="EMR_TRAX_ORACLE_IB_JDI_OU"
+
+## DFF against Lookup
+$FND_TOP/bin/FNDLOAD apps/$APPS_PASS O Y DOWNLOAD $FND_TOP/patch/115/import/afffload.lct XXECS_DIST_OB_PO_MAIN_LOOKUP_DFF.ldt DESC_FLEX P_LEVEL='COL_ALL:REF_ALL:CTX_ONE' APPLICATION_SHORT_NAME="FND" DESCRIPTIVE_FLEXFIELD_NAME="FND_COMMON_LOOKUPS" DESCRIPTIVE_FLEX_CONTEXT_CODE="XXECS_DIST_OB_PO_MAIN_LOOKUP"
+
+## Key Flexfield Structures
+$FND_TOP/bin/FNDLOAD apps/$APPS_PASS O Y DOWNLOAD $FND_TOP/patch/115/import/afffload.lct file_name_KFF.ldt KEY_FLEX P_LEVEL=’COL_ALL:FQL_ALL:SQL_ALL:STR_ONE:WFP_ALL:SHA_ALL:CVR_ALL:SEG_ALL’ APPLICATION_SHORT_NAME="FND" ID_FLEX_CODE="key flex code" P_STRUCTURE_CODE="structure name"
+
+## Profile XXAMT_PO_FILE_UPLOAD_PATH
+$FND_TOP/bin/FNDLOAD apps/$APPS_PASS 0 Y DOWNLOAD $FND_TOP/patch/115/import/afscprof.lct XXAMT_PO_FILE_UPLOAD_PATH_PRF.ldt PROFILE  APPLICATION_SHORT_NAME="PO" PROFILE_NAME="XXAMT_PO_FILE_UPLOAD_PATH" 
+
+## Messages
+FNDLOAD apps/$APPS_PASS O Y DOWNLOAD $FND_TOP/patch/115/import/afmdmsg.lct file_name.ldt FND_NEW_MESSAGES APPLICATION_SHORT_NAME="XXCUST" MESSAGE_NAME="MESSAGE_NAME"
+
+## Alerts
+FNDLOAD apps/$APPS_PASS 0 Y DOWNLOAD $ALR_TOP/patch/115/import/alr.lct XX_EMR_GPD_PITEM_STS_REQ_RMT.ldt ALR_ALERTS APPLICATION_SHORT_NAME=XXMFG ALERT_NAME="EMR XXMFG GPD Phase-in Item Status Request RMT"
+
+## Forms Personalization
+FNDLOAD apps/$APPS_PASS 0 Y DOWNLOAD $FND_TOP/patch/115/import/affrmcus.lct XXCSP_PARTSREQ_DOLLAR.ldt FND_FORM_CUSTOM_RULES function_name=CSP_CSPTRREQ 
+
+## Workflow
+WFLOAD apps/$APPS_PASS 0 Y DOWNLOAD XXDBDWSHDEL.wft WSHDEL
+
+## BI Publisher -- Definitions
+$FND_TOP/bin/FNDLOAD apps/$APPS_PASS 0 Y DOWNLOAD $XDO_TOP/patch/115/import/xdotmpl.lct XXDOCONDWR_BI.ldt XDO_DS_DEFINITIONS APPLICATION_SHORT_NAME="XXCUST" DATA_SOURCE_CODE="XXDOCONDWR"
+
+## Download all files
+java oracle.apps.xdo.oa.util.XDOLoader DOWNLOAD \
+ -DB_USERNAME apps \
+ -DB_PASSWORD $APPS_PASS \
+ -JDBC_CONNECTION 192.168.17.38:1523:CLONE \
+ -APPS_SHORT_NAME XXCUST \
+ -LCT_FILE $XDO_TOP/patch/115/import/xdotmpl.lct \
+ -DS_CODE XXDOPOPRRTRNDATA
+ 
+## XML definition file
+java oracle.apps.xdo.oa.util.XDOLoader DOWNLOAD \
+ -DB_USERNAME apps \
+ -DB_PASSWORD $APPS_PASS \
+ -JDBC_CONNECTION $JDBC_CON \
+ -APPS_SHORT_NAME XXCUST \
+ -LOB_CODE XXDOPOPRRTRNDATA \
+ -LOB_TYPE TEMPLATE \
+ -LCT_FILE $XDO_TOP/patch/115/import/xdotmpl.lct \
+ -XDO_FILE_TYPE XML-DATA-TEMPLATE
+ 
+## RTF template File
+java oracle.apps.xdo.oa.util.XDOLoader DOWNLOAD \
+ -DB_USERNAME apps \
+ -DB_PASSWORD $APPS_PASS \
+ -JDBC_CONNECTION $JDBC_CON \
+ -APPS_SHORT_NAME XXCUST \
+ -LOB_CODE XXDOPOPRRTRNDATA \
+ -LOB_TYPE TEMPLATE_SOURCE \
+ -LCT_FILE $XDO_TOP/patch/115/import/xdotmpl.lct \
+ -XDO_FILE_TYPE RTF \
+ -LANGUAGE en \
+ -TERRITORY US #Optional 
+ 
+## Excel template File
+java oracle.apps.xdo.oa.util.XDOLoader DOWNLOAD \
+ -DB_USERNAME apps \
+ -DB_PASSWORD $APPS_PASS \
+ -JDBC_CONNECTION 192.168.17.38:1523:CLONE \
+ -APPS_SHORT_NAME XXCUST \
+ -LOB_CODE XXDOPOPRRTRNDATA \
+ -LOB_TYPE TEMPLATE_SOURCE \
+ -LCT_FILE $XDO_TOP/patch/115/import/xdotmpl.lct \
+ -XDO_FILE_TYPE XLS \
+ -LANGUAGE en \
+ -TERRITORY US \ #Optional 
+ -FILE_NAME XXDOTL_BP_RELEASE_STD_RTF_en_bkup20161130.rtf #Optional 
+ 
+[>END<]!$[FingerTextData FingerTextData]@#
+tagshort
+Ext:xml
+<$[![tagname]!]/>[>END<]!$[FingerTextData FingerTextData]@#
+tag
+Ext:xml
+<$[![tagname]!]>$[0[]0]</$[![tagname]!]>[>END<]!$[FingerTextData FingerTextData]@#
+declaration
+Ext:xml
+<?xml version="1.0"?>$[![]!][>END<]!$[FingerTextData FingerTextData]@#
+cdata
+Ext:xml
+<![CDATA[
+  $[![]!]
+]]>[>END<]!$[FingerTextData FingerTextData]@#
+times
+Ext:rb
+times do |$[![i]!]|
+  $[1[(key)SELECTION]1]$[![]!]
+end[>END<]!$[FingerTextData FingerTextData]@#
+shebang
+Ext:rb
+#!/usr/bin/env ruby$[![]!][>END<]!$[FingerTextData FingerTextData]@#
+rescuelog
+Ext:rb
+begin
+  $[![]!]
+rescue Exception => e
+  File.open("exception.log") do |f|
+    f.puts e.inspect
+    f.puts e.backtrace
+  end
+end[>END<]!$[FingerTextData FingerTextData]@#
+rescue
+Ext:rb
+begin
+  $[![]!]
+rescue Exception => e
+  p e.inspect
+  p e.backtrace
+end[>END<]!$[FingerTextData FingerTextData]@#
+raise
+Ext:rb
+raise "$[![Error!]!]"[>END<]!$[FingerTextData FingerTextData]@#
+lambda
+Ext:rb
+lambda do |$[![e]!]|
+  $[1[(key)SELECTION]1]$[![]!]
+end[>END<]!$[FingerTextData FingerTextData]@#
+if
+Ext:rb
+if $[![{condition}]!]
+  $[![{body1}]!]
+else
+  $[![{body2}]!]
+end[>END<]!$[FingerTextData FingerTextData]@#
+flash
+Ext:rb
+flash[:$[![notice]!]] = "$[![(content)]!]"[>END<]!$[FingerTextData FingerTextData]@#
+exceptionlog
+Ext:rb
+begin
+  $[![]!]
+rescue Exception => e
+  File.open("exception.log") do |f|
+    f.puts e.inspect
+    f.puts e.backtrace
+  end
+end[>END<]!$[FingerTextData FingerTextData]@#
+each
+Ext:rb
+each do |$[![i]!]|
+  $[1[(key)SELECTION]1]$[![]!]
+end[>END<]!$[FingerTextData FingerTextData]@#
+do
+Ext:rb
+do |$[![i]!]|
+  $[1[(key)SELECTION]1]$[![]!]
+end[>END<]!$[FingerTextData FingerTextData]@#
+dir
+Ext:rb
+File.dirname(__FILE__)[>END<]!$[FingerTextData FingerTextData]@#
+def
+Ext:rb
+def $[![{method name}]!]$[![]!]
+  $[1[(key)SELECTION]1]$[![]!]
+end[>END<]!$[FingerTextData FingerTextData]@#
+case
+Ext:rb
+case $[![{object}]!]
+when $[![{condition1}]!]
+  $[![{body1}]!]
+when $[![{condition2}]!]
+  $[![{body2}]!]
+else
+  $[![{default}]!]
+end[>END<]!$[FingerTextData FingerTextData]@#
+alias
+Ext:rb
+alias_method :$[![{new name}]!], :$[![{old name}]!][>END<]!$[FingerTextData FingerTextData]@#
+aa
+Ext:rb
+attr_accessor :$[![{attr name}]!][>END<]!$[FingerTextData FingerTextData]@#
+try
+Ext:r
+tryCatch({
+	$[![try]!]
+}, error = function(e){
+	$[![catch]!]
+})
+[>END<]!$[FingerTextData FingerTextData]@#
+switch
+Ext:r
+switch($[![key]!],
+	$[![item_1]!] = $[!["value_1"]!],
+	$[![item_2]!] = $[!["value_2"]!]
+)
+[>END<]!$[FingerTextData FingerTextData]@#
+sortdf
+Ext:r
+$[![my_data_frame]!][with($[![my_data_frame]!],order($[![order_by]!]),]
+[>END<]!$[FingerTextData FingerTextData]@#
+roxygen
+Ext:r
+#' Description 
+#' @name 
+#' @aliases 
+#' @title 
+#' @param 
+#' @param 
+#' @param 
+#' @return 
+#' @author 
+#' @seealso \code{\link{}} 
+#' @export
+#' @examples      
+#' \dontrun{
+#' 
+#' }  [>END<]!$[FingerTextData FingerTextData]@#
+rm
+Ext:r
+rm(list=ls(all=TRUE))
+$[![]!][>END<]!$[FingerTextData FingerTextData]@#
+lm
+Ext:r
+summary(lm($[![y~x]!]))[>END<]!$[FingerTextData FingerTextData]@#
+fun
+Ext:r
+$[![function_name]!]<-function(){
+	$[![expression]!]
+}
+[>END<] !$[FingerTextData FingerTextData]@#
+foreach
+Ext:r
+foreach($[![iterator]!] ) %do% {
+	$[![expression]!]
+}
+[>END<]!$[FingerTextData FingerTextData]@#
+for
+Ext:r
+for ($[![i=]!]){
+	$[![expression]!]
+}
+[>END<]!$[FingerTextData FingerTextData]@#
+cl
+Ext:r
+cl<-makeCluster(detectCores(8))
+[>END<]!$[FingerTextData FingerTextData]@#
+S3generic
+Ext:r
+$[![method_name]!] <-
+function(x,...){
+    UseMethod("$[![method_name]!]")
+}
+[>END<] !$[FingerTextData FingerTextData]@#
+write
+Ext:js
+document.write("$[![<p>Hello World</p>]!]");[>END<]!$[FingerTextData FingerTextData]@#
+var
+Ext:js
+var $[![x]!] = $[![]!][>END<]!$[FingerTextData FingerTextData]@#
+ifelse
+Ext:js
+if ($[![{condition}]!])
+{
+  $[![]!]
+} else
+{
+  $[![]!]
+}
+[>END<]!$[FingerTextData FingerTextData]@#
+if
+Ext:js
+if ($[![{condition}]!])
+{
+  $[![]!]
+}
+[>END<]!$[FingerTextData FingerTextData]@#
+getbyid
+Ext:js
+document.getElementById("$[![some_id]!]")$[![]!][>END<]!$[FingerTextData FingerTextData]@#
+function
+Ext:js
+function $[![function_name]!]()
+{
+  $[![]!];
+}
+[>END<]!$[FingerTextData FingerTextData]@#
+for
+Ext:js
+for ($[![i]!]=0;$[![i]!]<=$[![max_value]!];$[![i]!]++)
+{
+  $[![]!]
+}
+[>END<]!$[FingerTextData FingerTextData]@#
+comment
+Ext:js
+/*  $[0[]0]  */[>END<]!$[FingerTextData FingerTextData]@#
+array
+Ext:js
+var $[![array_name]!] = new Array($[!["item 1"]!],$[!["item 2"]!],$[!["item 3"]!]);[>END<]!$[FingerTextData FingerTextData]@#
+alert
+Ext:js
+alert("$[![Hello World!]!]");[>END<]!$[FingerTextData FingerTextData]@#
+ul
+Ext:html
+<ul>
+	<li>$[![item 1]!]</li>
+	<li>$[![item 2]!]</li>
+  <li>$[![item 3]!]$[0[]0]</li>
+</ul>[>END<]!$[FingerTextData FingerTextData]@#
+u
+Ext:html
+<u>$[0[]0]</u>[>END<]!$[FingerTextData FingerTextData]@#
+tt
+Ext:html
+<tt>$[0[]0]</tt>[>END<]!$[FingerTextData FingerTextData]@#
+tr
+Ext:html
+<tr>$[0[]0]</tr>[>END<]!$[FingerTextData FingerTextData]@#
+title
+Ext:html
+title="$[0[]0]"[>END<]!$[FingerTextData FingerTextData]@#
+th
+Ext:html
+<th>$[0[]0]</th>[>END<]!$[FingerTextData FingerTextData]@#
+tf
+Ext:html
+<input type="text" name="$[![{some name}]!]" value="$[![{some value}]!]" />[>END<]!$[FingerTextData FingerTextData]@#
+template
+Ext:html
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>some title</title>
+  </head>
+  <body>
+    <h1>Hello World!</h1>
+    <p>This is an HTML document template.
+  </body>
+</html>[>END<]!$[FingerTextData FingerTextData]@#
+td
+Ext:html
+<td>$[0[]0]</td>[>END<]!$[FingerTextData FingerTextData]@#
+tagshort
+Ext:html
+<$[![tagname]!]/>[>END<]!$[FingerTextData FingerTextData]@#
+tag
+Ext:html
+<$[![tagname]!]>$[0[]0]</$[![tagname]!]>[>END<]!$[FingerTextData FingerTextData]@#
+table
+Ext:html
+<table$[![ border="1"]!]>
+  <tr>
+    <th>$[![Header 1]!]</th>
+    <th>$[![Header 2]!]</th>
+  </tr>
+  <tr>
+    <td>$[![row 1 col 1]!]</td>
+    <td>$[![row 1 col 2]!]</td>
+  </tr>
+  <tr>
+    <td>$[![row 2 col 1]!]</td>
+    <td>$[![row 2 col 2]!]</td>
+  </tr>
+</table>[>END<]!$[FingerTextData FingerTextData]@#
+sup
+Ext:html
+<sup>$[0[]0]</sup>[>END<]!$[FingerTextData FingerTextData]@#
+submit
+Ext:html
+<input type="submit" value="$[![Submit]!]" />[>END<]!$[FingerTextData FingerTextData]@#
+sub
+Ext:html
+<sub>$[0[]0]</sub>[>END<]!$[FingerTextData FingerTextData]@#
+style
+Ext:html
+<style type="text/css">
+  $[0[]0]
+</style>[>END<]!$[FingerTextData FingerTextData]@#
+strong
+Ext:html
+<strong>$[0[]0]</strong>[>END<]!$[FingerTextData FingerTextData]@#
+span
+Ext:html
+<span id="$[![some_id]!]" class="$[![some_class]!]>$[0[]0]</span>[>END<]!$[FingerTextData FingerTextData]@#
+space
+Ext:html
+&nbsp;[>END<]!$[FingerTextData FingerTextData]@#
+small
+Ext:html
+<small>$[0[]0]</small>[>END<]!$[FingerTextData FingerTextData]@#
+select
+Ext:html
+<select>
+  <option>$[![option 1]!]</option>
+  <option>$[![option 2]!]</option>
+  <option>$[![option 3]!]$[0[]0]</option>
+</select>[>END<]!$[FingerTextData FingerTextData]@#
+script
+Ext:html
+<script type="text/javascript">
+  $[0[]0]
+</script>[>END<]!$[FingerTextData FingerTextData]@#
+samp
+Ext:html
+<samp>$[0[]0]</samp>[>END<]!$[FingerTextData FingerTextData]@#
+php
+Ext:html
+<?php $[0[]0]?>[>END<]!$[FingerTextData FingerTextData]@#
+p
+Ext:html
+<p>$[0[]0]</p>[>END<]!$[FingerTextData FingerTextData]@#
+ol
+Ext:html
+<ol>
+	<li>$[![item 1]!]</li>
+	<li>$[![item 2]!]</li>
+  <li>$[![item 3]!]$[0[]0]</li>
+</ol>[>END<]!$[FingerTextData FingerTextData]@#
+noscript
+Ext:html
+<noscript>$[![Your browser does not support JavaScript!]!]$[0[]0]</noscript>[>END<]!$[FingerTextData FingerTextData]@#
+meta
+Ext:html
+<meta name="description" content="$[![some description]!]" />
+<meta name="keywords" content="$[![HTML,CSS,XML,JavaScript]!]" />
+<meta name="author" content="$[![{your name}]!]" />
+<meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+[>END<]!$[FingerTextData FingerTextData]@#
+loadjs
+Ext:html
+<script type="text/javascript" src="$[![javascript]!].js"></script>[>END<]!$[FingerTextData FingerTextData]@#
+loadcss
+Ext:html
+<link rel="stylesheet" type="text/css" href="$[![{style_sheet}]!].css">[>END<]!$[FingerTextData FingerTextData]@#
+kbd
+Ext:html
+<kbd>$[0[]0]</kbd>[>END<]!$[FingerTextData FingerTextData]@#
+ins
+Ext:html
+<ins>$[0[]0]</ins>[>END<]!$[FingerTextData FingerTextData]@#
+img
+Ext:html
+<img src="$[![image]!].jpg" alt="$[![IMAGE]!]"$[![ align="left" ]!]/>[>END<]!$[FingerTextData FingerTextData]@#
+id
+Ext:html
+id="$[![some_id]!]"[>END<]!$[FingerTextData FingerTextData]@#
+i
+Ext:html
+<i>$[0[]0]</i>[>END<]!$[FingerTextData FingerTextData]@#
+hr
+Ext:html
+<hr/>[>END<]!$[FingerTextData FingerTextData]@#
+head
+Ext:html
+<head>$[0[]0]</head>[>END<]!$[FingerTextData FingerTextData]@#
+h2
+Ext:html
+<h2>$[0[]0]</h2>[>END<]!$[FingerTextData FingerTextData]@#
+h1
+Ext:html
+<h1>$[0[]0]</h1>[>END<]!$[FingerTextData FingerTextData]@#
+form
+Ext:html
+<form name="$[![some_name]!]" action="$[![{form action link}]!]" method="$[![post]!]">
+  $[0[]0]
+</form>[>END<]!$[FingerTextData FingerTextData]@#
+em
+Ext:html
+<em>$[0[]0]</em>[>END<]!$[FingerTextData FingerTextData]@#
+doctype
+Ext:html
+<!DOCTYPE $[![(lis)html|html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"|html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"|html PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd"]!]>
+$[0[]0][>END<]!$[FingerTextData FingerTextData]@#
+div
+Ext:html
+<div id="$[![some_id]!]" class="$[![some_class]!]>$[0[]0]</div>[>END<]!$[FingerTextData FingerTextData]@#
+dfn
+Ext:html
+<dfn>$[0[]0]</dfn>[>END<]!$[FingerTextData FingerTextData]@#
+del
+Ext:html
+<del>$[0[]0]</del>[>END<]!$[FingerTextData FingerTextData]@#
+comment
+Ext:html
+<!-- $[0[]0] -->[>END<]!$[FingerTextData FingerTextData]@#
+code
+Ext:html
+<code>$[0[]0]</code>[>END<]!$[FingerTextData FingerTextData]@#
+class
+Ext:html
+class="$[![some_class]!]"[>END<]!$[FingerTextData FingerTextData]@#
+cite
+Ext:html
+<cite>$[0[]0]</cite>[>END<]!$[FingerTextData FingerTextData]@#
+button
+Ext:html
+<input type="button" value="$[![Button 1]!]" onClick='$[![some_function()]!]'/>$[0[]0][>END<]!$[FingerTextData FingerTextData]@#
+br
+Ext:html
+<br/>[>END<]!$[FingerTextData FingerTextData]@#
+big
+Ext:html
+<big>$[0[]0]</big>[>END<]!$[FingerTextData FingerTextData]@#
+b
+Ext:html
+<b>$[0[]0]</b>[>END<]!$[FingerTextData FingerTextData]@#
+a
+Ext:html
+<a href="$[![{link}]!]">$[![{text}]!]</a>[>END<]!$[FingerTextData FingerTextData]@#
+zindex
+Ext:css
+z-index:$[0[]0];[>END<]!$[FingerTextData FingerTextData]@#
+yellow
+Ext:css
+#FFFF00[>END<]!$[FingerTextData FingerTextData]@#
+wordwrap
+Ext:css
+word-wrap:$[0[]0];[>END<]!$[FingerTextData FingerTextData]@#
+wordspacing
+Ext:css
+word-spacing:$[![30]!]px;[>END<]!$[FingerTextData FingerTextData]@#
+wordbreak
+Ext:css
+word-break:$[0[]0];[>END<]!$[FingerTextData FingerTextData]@#
+width
+Ext:css
+width:$[![100]!]px[>END<]!$[FingerTextData FingerTextData]@#
+whitespace
+Ext:css
+white-space:$[![(lis)inherit|normal|nowrap|pre|pre-line|pre-wrap]!];[>END<]!$[FingerTextData FingerTextData]@#
+white
+Ext:css
+#FFFFFF[>END<]!$[FingerTextData FingerTextData]@#
+visibility
+Ext:css
+visibility:$[![(lis)collapse|hidden|inherit|visible]!][>END<]!$[FingerTextData FingerTextData]@#
+verticalalign
+Ext:css
+vertical-align:$[![(lis)baseline|bottom|inherit|middle|sub|super|text-bottom|text-top|top]!];[>END<]!$[FingerTextData FingerTextData]@#
+top
+Ext:css
+top:$[0[]0];[>END<]!$[FingerTextData FingerTextData]@#
+textwrap
+Ext:css
+text-wrap:$[![(lis)none|normal|suppress|unrestricted]!];[>END<]!$[FingerTextData FingerTextData]@#
+texttransform
+Ext:css
+text-transform:$[![(lis)capitalize|inherit|lowercase|none|uppercase]!];[>END<]!$[FingerTextData FingerTextData]@#
+textshadow
+Ext:css
+text-shadow:$[![{h-shadow}]!] $[![{v-shadow}]!] $[![(cha)colorlist]!];[>END<]!$[FingerTextData FingerTextData]@#
+textoverflow
+Ext:css
+text-overflow:$[0[]0];[>END<]!$[FingerTextData FingerTextData]@#
+textoutline
+Ext:css
+text-outline:$[![{thickness}]!] $[![(cha)colorlist]!];[>END<]!$[FingerTextData FingerTextData]@#
+textjustify
+Ext:css
+text-align:justify;
+text-justify:$[![(lis)auto|distribute|kashida|inter-cluster|inter-ideograph|inter-word|none]!];[>END<]!$[FingerTextData FingerTextData]@#
+textindent
+Ext:css
+text-indent:$[![50]!]px;[>END<]!$[FingerTextData FingerTextData]@#
+textdecoration
+Ext:css
+text-decoration:$[![(lis)blink|inherit|line-through|none|overline|underline]!];[>END<]!$[FingerTextData FingerTextData]@#
+textalign
+Ext:css
+text-align:$[![(lis)center|inherit|justify|left|right]!];[>END<]!$[FingerTextData FingerTextData]@#
+template
+Ext:css
+body
+{
+  background-color:$[![#FFEE99]!]
+}
+
+h1
+{
+  color:$[![#AA5500]!];
+  text-align:center;
+}
+
+p
+{
+  font-family:"Times New Roman";
+  font-size:20px;
+}[>END<]!$[FingerTextData FingerTextData]@#
+tablelayout
+Ext:css
+table-layout:$[![(lis)auto|fixed|inherit]!];[>END<]!$[FingerTextData FingerTextData]@#
+stylelist
+Ext:css
+$[![(lis)dashed|dotted|double|groove|hidden|inherit|inset|none|outset|ridge|solid]!][>END<]!$[FingerTextData FingerTextData]@#
+sizelist
+Ext:css
+$[![(lis)|inherit|large|larger|medium|small|smaller|xx-large|xx-small|x-large|x-small]!][>END<]!$[FingerTextData FingerTextData]@#
+right
+Ext:css
+right:$[![5]!]px;[>END<]!$[FingerTextData FingerTextData]@#
+rgb
+Ext:css
+rgb($[![255]!],$[![255]!],$[![255]!])[>END<]!$[FingerTextData FingerTextData]@#
+red
+Ext:css
+#FF0000[>END<]!$[FingerTextData FingerTextData]@#
+punctuationtrim
+Ext:css
+punctuation-trim:$[![(lis)adjacent|allow-end|end|none|start]!];[>END<]!$[FingerTextData FingerTextData]@#
+position
+Ext:css
+position:$[![(lis)absolute|fixed|inherit|relative|static]!];[>END<]!$[FingerTextData FingerTextData]@#
+paddingtop
+Ext:css
+padding-top:$[![10]!]px[>END<]!$[FingerTextData FingerTextData]@#
+paddingright
+Ext:css
+padding-right:$[![10]!]px[>END<]!$[FingerTextData FingerTextData]@#
+paddingleft
+Ext:css
+padding-left:$[![10]!]px[>END<]!$[FingerTextData FingerTextData]@#
+paddingbottom
+Ext:css
+padding-bottom:$[![10]!]px[>END<]!$[FingerTextData FingerTextData]@#
+padding
+Ext:css
+padding:$[0[]0];[>END<]!$[FingerTextData FingerTextData]@#
+overflow
+Ext:css
+overflow:$[![(lis)auto|inherit|hidden|scroll|visible]!];[>END<]!$[FingerTextData FingerTextData]@#
+outlinewidth
+Ext:css
+outline-width:$[![15]!]px[>END<]!$[FingerTextData FingerTextData]@#
+outlinestyle
+Ext:css
+outline-style:$[![(cha)stylelist]!][>END<]!$[FingerTextData FingerTextData]@#
+outlinecolor
+Ext:css
+outline-color:$[![(cha)colorlist]!][>END<]!$[FingerTextData FingerTextData]@#
+outline
+Ext:css
+outline:$[0[]0];[>END<]!$[FingerTextData FingerTextData]@#
+minwidth
+Ext:css
+min-width:$[![100]!]px[>END<]!$[FingerTextData FingerTextData]@#
+minheight
+Ext:css
+min-height:$[![100]!]px[>END<]!$[FingerTextData FingerTextData]@#
+maxwidth
+Ext:css
+max-width:$[![100]!]px[>END<]!$[FingerTextData FingerTextData]@#
+maxheight
+Ext:css
+max-height:$[![100]!]px[>END<]!$[FingerTextData FingerTextData]@#
+margintop
+Ext:css
+margin-top:$[![10]!]px[>END<]!$[FingerTextData FingerTextData]@#
+marginright
+Ext:css
+margin-right:$[![10]!]px[>END<]!$[FingerTextData FingerTextData]@#
+marginleft
+Ext:css
+margin-left:$[![10]!]px[>END<]!$[FingerTextData FingerTextData]@#
+marginbottom
+Ext:css
+margin-bottom:$[![10]!]px[>END<]!$[FingerTextData FingerTextData]@#
+margin
+Ext:css
+margin:$[0[]0];[>END<]!$[FingerTextData FingerTextData]@#
+lineheight
+Ext:css
+line-height:$[![100%]!];[>END<]!$[FingerTextData FingerTextData]@#
+lime
+Ext:css
+#00FF00[>END<]!$[FingerTextData FingerTextData]@#
+letterspacing
+Ext:css
+letter-spacing:$[![2]!]px;[>END<]!$[FingerTextData FingerTextData]@#
+left
+Ext:css
+left:$[![5]!]px;[>END<]!$[FingerTextData FingerTextData]@#
+height
+Ext:css
+height:$[![100]!]px[>END<]!$[FingerTextData FingerTextData]@#
+hangingpunctuation
+Ext:css
+hanging-punctuation:$[![(lis)allow-end|first|force-end|last|none]!];[>END<]!$[FingerTextData FingerTextData]@#
+grey
+Ext:css
+#808080[>END<]!$[FingerTextData FingerTextData]@#
+green
+Ext:css
+#008000[>END<]!$[FingerTextData FingerTextData]@#
+fontweight
+Ext:css
+font-weight:$[![(lis)blod|bloder|lighter|inherit|normal|100|200|300|400|500|600|700|800|900]!][>END<]!$[FingerTextData FingerTextData]@#
+fontvariant
+Ext:css
+font-variant:$[![(lis)inherit|normal|small-caps]!][>END<]!$[FingerTextData FingerTextData]@#
+fontstyle
+Ext:css
+font-style:$[![(lis)italic|normal|oblique]!][>END<]!$[FingerTextData FingerTextData]@#
+fontsize
+Ext:css
+font-size:$[![(cha)sizelist]!][>END<]!$[FingerTextData FingerTextData]@#
+fontfamily
+Ext:css
+font-family:$[!["Times New Roman"]!][>END<]!$[FingerTextData FingerTextData]@#
+font
+Ext:css
+font:$[0[]0];[>END<]!$[FingerTextData FingerTextData]@#
+float
+Ext:css
+float:$[![(lis)inherit|left|right|none]!];[>END<]!$[FingerTextData FingerTextData]@#
+emptycells
+Ext:css
+empty-cells:$[![(lis)hide|inherit|show]!];[>END<]!$[FingerTextData FingerTextData]@#
+display
+Ext:css
+display:$[![(lis)block|inherit|inline|inline-block|inline-table|list-item|none|run-in|table|table-caption|table-cell|table-column|table-column-group|table-footer-group|table-header-group|table-row|table-row-group]!];[>END<]!$[FingerTextData FingerTextData]@#
+direction
+Ext:css
+direction:$[![(lis)ltr|inherit|rtl]!];[>END<]!$[FingerTextData FingerTextData]@#
+cyan
+Ext:css
+#00FFFF[>END<]!$[FingerTextData FingerTextData]@#
+cursor
+Ext:css
+cursor:$[![(lis)auto|crosshair|default|e-resize|help|inherit|move|ne-resize|nw-resize|n-resize|pointer|progress|se-resize|sw-resize|s-resize|text|wait|w-resize]!][>END<]!$[FingerTextData FingerTextData]@#
+comment
+Ext:css
+/*  $[0[]0]  */[>END<]!$[FingerTextData FingerTextData]@#
+colorlist
+Ext:css
+$[![(lis)|black|blue|grey|green|orange|pink|purple|red|snow|white|yellow]!][>END<]!$[FingerTextData FingerTextData]@#
+color
+Ext:css
+#$[![000000]!][>END<]!$[FingerTextData FingerTextData]@#
+clip
+Ext:css
+clip:rect($[![0]!]px,$[![60]!]px,$[![200]!]px,$[![0]!]px);[>END<]!$[FingerTextData FingerTextData]@#
+clear
+Ext:css
+clear:$[![(lis)both|inherit|left|none|right]!];[>END<]!$[FingerTextData FingerTextData]@#
+captionside
+Ext:css
+caption-side:$[![(lis)bottom|inherit|top]!];[>END<]!$[FingerTextData FingerTextData]@#
+bottom
+Ext:css
+bottom:$[0[]0];[>END<]!$[FingerTextData FingerTextData]@#
+borderwidth
+Ext:css
+border-width:$[![15]!]px[>END<]!$[FingerTextData FingerTextData]@#
+bordertopwidth
+Ext:css
+border-top-width:$[![15]!]px[>END<]!$[FingerTextData FingerTextData]@#
+bordertopstyle
+Ext:css
+border-top-style:$[![(cha)stylelist]!][>END<]!$[FingerTextData FingerTextData]@#
+bordertopcolor
+Ext:css
+border-top-color:$[![(cha)colorlist]!][>END<]!$[FingerTextData FingerTextData]@#
+bordertop
+Ext:css
+border-top:$[0[]0];[>END<]!$[FingerTextData FingerTextData]@#
+borderstyle
+Ext:css
+border-style:$[![(cha)stylelist]!][>END<]!$[FingerTextData FingerTextData]@#
+borderspacing
+Ext:css
+border-spacing:$[![10]!]px $[![30]!]px;[>END<]!$[FingerTextData FingerTextData]@#
+borderrightwidth
+Ext:css
+border-right-width:$[![15]!]px[>END<]!$[FingerTextData FingerTextData]@#
+borderrightstyle
+Ext:css
+border-right-style:$[![(cha)stylelist]!][>END<]!$[FingerTextData FingerTextData]@#
+borderrightcolor
+Ext:css
+border-right-color:$[![(cha)colorlist]!][>END<]!$[FingerTextData FingerTextData]@#
+borderright
+Ext:css
+border-right:$[0[]0];[>END<]!$[FingerTextData FingerTextData]@#
+borderleftwidth
+Ext:css
+border-left-width:$[![15]!]px[>END<]!$[FingerTextData FingerTextData]@#
+borderleftstyle
+Ext:css
+border-left-style:$[![(cha)stylelist]!][>END<]!$[FingerTextData FingerTextData]@#
+borderleftcolor
+Ext:css
+border-left-color:$[![(cha)colorlist]!][>END<]!$[FingerTextData FingerTextData]@#
+borderleft
+Ext:css
+border-left:$[0[]0];[>END<]!$[FingerTextData FingerTextData]@#
+bordercolor
+Ext:css
+border-color:$[![(cha)colorlist]!][>END<]!$[FingerTextData FingerTextData]@#
+bordercollapse
+Ext:css
+border-collapse:$[![(lis)collapse|inherit|separate]!];[>END<]!$[FingerTextData FingerTextData]@#
+borderbottomwidth
+Ext:css
+border-bottom-width:$[![15]!]px[>END<]!$[FingerTextData FingerTextData]@#
+borderbottomstyle
+Ext:css
+border-bottom-style:$[![(cha)stylelist]!][>END<]!$[FingerTextData FingerTextData]@#
+borderbottomcolor
+Ext:css
+border-bottom-color:$[![(cha)colorlist]!][>END<]!$[FingerTextData FingerTextData]@#
+borderbottom
+Ext:css
+border-bottom:$[0[]0];[>END<]!$[FingerTextData FingerTextData]@#
+border
+Ext:css
+border:$[0[]0];[>END<]!$[FingerTextData FingerTextData]@#
+blue
+Ext:css
+#0000FF[>END<]!$[FingerTextData FingerTextData]@#
+black
+Ext:css
+#000000[>END<]!$[FingerTextData FingerTextData]@#
+backgroundrepeat
+Ext:css
+background-repeat:no-repeat;[>END<]!$[FingerTextData FingerTextData]@#
+backgroundimage
+Ext:css
+background-image:url('$[![image.gif]!]');[>END<]!$[FingerTextData FingerTextData]@#
+backgroundcolor
+Ext:css
+background-color:$[![(cha)colorlist]!][>END<]!$[FingerTextData FingerTextData]@#
+backgroundattachment
+Ext:css
+background-attachment:fixed;[>END<]!$[FingerTextData FingerTextData]@#
+background
+Ext:css
+background:$[0[]0];[>END<]!$[FingerTextData FingerTextData]@#
